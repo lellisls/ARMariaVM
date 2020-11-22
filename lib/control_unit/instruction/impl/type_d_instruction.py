@@ -1,5 +1,5 @@
-from control_unit.instruction.instruction import Instruction
-from control_unit.register.register import Register
+from lib.control_unit.instruction.instruction import Instruction
+from lib.control_unit.register.register import Register
 
 
 class TypeDInstruction(Instruction):

@@ -1,4 +1,4 @@
-from control_unit.instruction.impl import *
+from lib.control_unit.instruction.impl import *
 
 names = {
     1: "LSL",

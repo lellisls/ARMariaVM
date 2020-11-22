@@ -1,8 +1,8 @@
-from control_unit.instruction.instruction import Instruction
-from control_unit.register.register import Register
+from lib.control_unit.instruction.instruction import Instruction
+from lib.control_unit.register.register import Register
 
 
-class TypeHInstruction(Instruction):
+class TypeIInstruction(Instruction):
     def __init__(self, id_, name, register_d):
         self.id = id_
         self.name = name

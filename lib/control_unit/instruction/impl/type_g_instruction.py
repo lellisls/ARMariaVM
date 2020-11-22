@@ -1,4 +1,4 @@
-from control_unit.instruction.instruction import Instruction
+from lib.control_unit.instruction.instruction import Instruction
 
 
 class TypeGInstruction(Instruction):

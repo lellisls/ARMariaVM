@@ -1,5 +1,5 @@
-from file.file_reader import FileReader
-from memory_unit.memory import Memory
+from lib.file.file_reader import FileReader
+from lib.memory_unit.memory import Memory
 
 
 class Bios(Memory):

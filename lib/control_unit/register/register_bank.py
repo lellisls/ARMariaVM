@@ -1,4 +1,4 @@
-from control_unit.register.register import Register
+from lib.control_unit.register.register import Register
 
 
 class RegisterBank:

@@ -1,4 +1,4 @@
-from memory_unit import Memory
+from lib.memory_unit import Memory
 
 
 class MainMemory(Memory):

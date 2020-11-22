@@ -1,4 +1,4 @@
-from control_unit.instruction.decodingHelper import DecodingHelper
+from lib.control_unit.instruction.decodingHelper import DecodingHelper
 
 
 class BytecodeDecoder:
