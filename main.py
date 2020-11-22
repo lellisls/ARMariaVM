@@ -1,8 +1,8 @@
 import os
 
 from file.programLoader import ProgramLoader
-from instruction.instructionFactory import InstructionFactory
 from instruction.decoder import BytecodeDecoder
+from instruction.instructionFactory import InstructionFactory
 
 if __name__ == '__main__':
     instructionFactory = InstructionFactory()
@@ -12,7 +12,11 @@ if __name__ == '__main__':
     for (lineno, bytecode, context) in instructions:
         try:
             decoder = BytecodeDecoder(bytecode)
-            decoder.decode()
+            result = decoder.decode()
+            print(f"{result.name} : {context}")
+
+            if result.name not in context.split(" "):
+                raise Exception(f"{result.name} not in context: {context}")
         except Exception as e:
             print(f"Error while decoding {bytecode}: {e}")
             print(f"Context: {lineno}: {bytecode} -- {context}")

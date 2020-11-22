@@ -1,5 +1,3 @@
-import logging
-
 from instruction.impl.typeAInstruction import TypeAInstruction
 from instruction.impl.typeBInstruction import TypeBInstruction
 from instruction.impl.typeCInstruction import TypeCInstruction
@@ -8,17 +6,21 @@ from instruction.impl.typeEInstruction import TypeEInstruction
 from instruction.impl.typeFInstruction import TypeFInstruction
 from instruction.impl.typeGInstruction import TypeGInstruction
 from instruction.impl.typeJInstruction import TypeJInstruction
+from instruction.impl.typeKInstruction import TypeKInstruction
 
 names = {
     1: "LSL",
     2: "LSR",
     4: "ADD",
+    5: "SUB",
     6: "ADD",
     7: "SUB",
     8: "MOV",
     10: "ADD",
     11: "SUB",
     22: "CMP",
+    25: "MUL",
+    34: "DIV",
     35: "MOV",
     36: "MOV",
     38: "B",
@@ -34,6 +36,7 @@ names = {
     68: "POP",
     69: "OUTPUT",
     70: "PAUSE",
+    71: "INPUT",
     72: "SWI",
     73: "B",
     74: "NOP",
@@ -64,9 +67,9 @@ class BytecodeDecoder:
 
     def _get_value_raw(self, bits: int) -> str:
         length = len(self.instruction)
-        # print(f"{self.instruction} : {length} - {bits}")
-        value = self.instruction[:bits]
-        print(value)
+        assert length >= bits
+        self.value_raw = value = self.instruction[:bits]
+        # print(f"{self.instruction} : {length} - {bits} : {value}")
         self.instruction = self.instruction[bits:]
         assert len(self.instruction) == (length - bits)
         return value
@@ -107,7 +110,8 @@ class BytecodeDecoder:
             raise Exception("Unhandled instruction error: " + self.original)
         if len(self.instruction) > 0:
             raise Exception("Instruction not fully processed" + self.original)
-        print(result.name)
+        if result.name is None:
+            raise Exception(f"Name not found for id {result.id}")
         return result
 
     def decode_default(self):
@@ -155,6 +159,11 @@ class BytecodeDecoder:
         RegD = self._get_value(3)
         return TypeJInstruction(id_, names.get(id_), RegD)
 
+    def _decode_typeK(self, id_):
+        self._get_value(3)  # 00000
+        RegD = self._get_value(4)
+        return TypeKInstruction(id_, names.get(id_), RegD)
+
     def decode_inst1_2(self):
         self.get_opbit()
         id_ = 2 if self.op else 1
@@ -184,16 +193,13 @@ class BytecodeDecoder:
         return self._decode_typeD(id_)
 
     def decode_inst12_39(self):
-        self.get_opbit()
-        self.get_func1()
         self.get_func2()
-        if self.op:  # 39
-            return None
-
         if self.func2 < 4:  # <= 27
+            self.get_func1()
             id_ = 12 + self.func2 * 4 + self.func1
             return self._decode_typeE(id_)
         elif self.func2 == 6:  # 34~37
+            self.get_func1()
             id_ = 34 + self.func1
             return self._decode_typeE(id_)
         elif self.func2 == 7:
@@ -232,9 +238,13 @@ class BytecodeDecoder:
         id_ = 56 if self.op else 57
         return self._decode_typeD(id_)
 
-    def decode_inst58_71(self):
+    def decode_inst58_71(self):  # 76
         self.get_func2()
-        if self.func2 == 2:  # 59~62
+        if self.func2 == 1:  # BL - LELLIS
+            self.get_opbit()
+            id_ = 79
+            return self._decode_typeK(id_)
+        elif self.func2 == 2:  # 59~62
             self.get_func1()
             id_ = 59 + self.func1
             return self._decode_typeE(id_)
@@ -249,8 +259,11 @@ class BytecodeDecoder:
             if self.func1 == 0:  # 69 - OUTPUT
                 id_ = 69
                 return self._decode_typeE(id_)
-            if self.func1 == 1:  # 70 - PAUSE
+            elif self.func1 == 1:  # 70 - PAUSE
                 id_ = 70
+                return self._decode_typeE(id_)
+            elif self.func1 == 2:  # 71 - INPUT
+                id_ = 71
                 return self._decode_typeE(id_)
 
     def decode_inst72(self):  # 72 - SWI
