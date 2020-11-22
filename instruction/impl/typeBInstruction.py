@@ -1,13 +1,17 @@
 from instruction.instruction import Instruction
+from instruction.register import Register
 
 
 class TypeBInstruction(Instruction):
-    def __init__(self, id, name, registerM, registerN, registerD):
-        self.id = id
+    def __init__(self, id_, name, register_m, register_n, register_d):
+        self.id = id_
         self.name = name
-        self.registerM = registerM
-        self.registerN = registerN
-        self.registerD = registerD
+        self.registerM = Register(register_m)
+        self.registerN = Register(register_n)
+        self.registerD = Register(register_d)
+
+    def _print_registers(self):
+        return f"{self.registerM} {self.registerN} {self.registerD}"
 
     def execute(self):
         pass
