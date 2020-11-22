@@ -13,5 +13,3 @@ class TypeAInstruction(Instruction):
     def _print_registers(self):
         return f"{self.immediate} {self.registerM} {self.registerD}"
 
-    def execute(self):
-        pass

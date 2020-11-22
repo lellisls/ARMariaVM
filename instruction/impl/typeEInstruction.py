@@ -12,5 +12,3 @@ class TypeEInstruction(Instruction):
     def _print_registers(self):
         return f"{self.registerM} {self.registerD}"
 
-    def execute(self):
-        pass

@@ -6,10 +6,6 @@ class Instruction:
     id = None
 
     @abstractmethod
-    def execute(self):
-        pass
-
-    @abstractmethod
     def _print_registers(self):
         raise NotImplementedError
 

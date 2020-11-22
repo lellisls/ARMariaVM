@@ -11,5 +11,3 @@ class TypeHInstruction(Instruction):
     def _print_registers(self):
         return f"{self.registerD}"
 
-    def execute(self):
-        pass

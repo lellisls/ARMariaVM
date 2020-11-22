@@ -13,5 +13,3 @@ class TypeBInstruction(Instruction):
     def _print_registers(self):
         return f"{self.registerM} {self.registerN} {self.registerD}"
 
-    def execute(self):
-        pass

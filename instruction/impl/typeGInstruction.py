@@ -11,5 +11,3 @@ class TypeGInstruction(Instruction):
     def _print_registers(self):
         return f"{self.condition} {self.offset}"
 
-    def execute(self):
-        pass

@@ -12,5 +12,3 @@ class TypeDInstruction(Instruction):
     def _print_registers(self):
         return f"{self.immediate} {self.registerD}"
 
-    def execute(self):
-        pass

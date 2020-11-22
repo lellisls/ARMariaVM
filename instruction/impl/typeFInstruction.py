@@ -12,5 +12,3 @@ class TypeFInstruction(Instruction):
     def _print_registers(self):
         return f"{self.condition} {self.registerD}"
 
-    def execute(self):
-        pass
