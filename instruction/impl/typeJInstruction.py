@@ -7,4 +7,7 @@ class TypeJInstruction(Instruction):
         self.name = name
         self.registerD = registerD
 
+    def execute(self):
+        pass
+
 

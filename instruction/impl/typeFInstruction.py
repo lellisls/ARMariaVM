@@ -7,3 +7,7 @@ class TypeFInstruction(Instruction):
         self.name = name
         self.condition = condition
         self.registerD = registerD
+
+    def execute(self):
+        pass
+

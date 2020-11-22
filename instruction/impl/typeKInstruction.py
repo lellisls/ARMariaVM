@@ -6,3 +6,6 @@ class TypeKInstruction(Instruction):
         self.id = id_
         self.name = name
         self.registerD = registerD
+
+    def execute(self):
+        pass

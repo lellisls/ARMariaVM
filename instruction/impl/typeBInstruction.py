@@ -8,3 +8,6 @@ class TypeBInstruction(Instruction):
         self.registerM = registerM
         self.registerN = registerN
         self.registerD = registerD
+
+    def execute(self):
+        pass

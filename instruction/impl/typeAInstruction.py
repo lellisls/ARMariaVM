@@ -8,3 +8,7 @@ class TypeAInstruction(Instruction):
         self.immediate = immediate
         self.registerM = registerM
         self.registerD = registerD
+
+    def execute(self):
+        pass
+

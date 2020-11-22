@@ -7,3 +7,7 @@ class TypeEInstruction(Instruction):
         self.name = name
         self.registerM = registerM
         self.registerD = registerD
+
+    def execute(self):
+        pass
+

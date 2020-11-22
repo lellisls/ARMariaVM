@@ -7,3 +7,7 @@ class TypeDInstruction(Instruction):
         self.name = name
         self.immediate = immediate
         self.registerD = registerD
+
+    def execute(self):
+        pass
+

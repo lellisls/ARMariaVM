@@ -7,3 +7,7 @@ class TypeGInstruction(Instruction):
         self.name = name
         self.cond = cond
         self.offset = offset
+
+    def execute(self):
+        pass
+
