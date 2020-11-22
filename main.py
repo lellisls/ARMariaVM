@@ -1,7 +1,5 @@
 import os
 
-from memory_unit import Bios, Memory
-
 main_dir = os.path.dirname(__file__)
 data_dir = os.path.join(main_dir, 'data')
 
