@@ -33,7 +33,7 @@ class ProgramLoader:
         try:
             decoder = BytecodeDecoder(bytecode)
             result = decoder.decode()
-            print(f"{result.name} : {context}")
+            # print(f"{result.name} : {context}")
 
             if str(result.id) not in context:
                 raise Exception(f"Id {result.id} not in context: {context}")
@@ -52,4 +52,4 @@ class ProgramLoader:
 
 if __name__ == '__main__':
     loader = ProgramLoader(os.path.join(os.path.dirname(__file__), "..", "data", "program.txt"))
-    print(len(loader.loadFile()))
+    # print(len(loader.loadFile()))
