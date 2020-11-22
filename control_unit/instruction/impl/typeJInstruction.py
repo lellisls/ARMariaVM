@@ -1,8 +1,8 @@
-from instruction.instruction import Instruction
-from instruction.register import Register
+from control_unit.instruction.instruction import Instruction
+from control_unit.register.register import Register
 
 
-class TypeKInstruction(Instruction):
+class TypeJInstruction(Instruction):
     def __init__(self, id_, name, register_d):
         self.id = id_
         self.name = name
@@ -10,4 +10,3 @@ class TypeKInstruction(Instruction):
 
     def _print_registers(self):
         return f"{self.registerD}"
-

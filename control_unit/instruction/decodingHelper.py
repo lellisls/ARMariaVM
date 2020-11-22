@@ -1,13 +1,4 @@
-from instruction.impl.typeAInstruction import TypeAInstruction
-from instruction.impl.typeBInstruction import TypeBInstruction
-from instruction.impl.typeCInstruction import TypeCInstruction
-from instruction.impl.typeDInstruction import TypeDInstruction
-from instruction.impl.typeEInstruction import TypeEInstruction
-from instruction.impl.typeFInstruction import TypeFInstruction
-from instruction.impl.typeGInstruction import TypeGInstruction
-from instruction.impl.typeIInstruction import TypeIInstruction
-from instruction.impl.typeJInstruction import TypeJInstruction
-from instruction.impl.typeKInstruction import TypeKInstruction
+from control_unit.instruction.impl import *
 
 names = {
     1: "LSL",

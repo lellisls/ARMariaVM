@@ -1,5 +1,5 @@
-from instruction.instruction import Instruction
-from instruction.register import Register
+from control_unit.instruction.instruction import Instruction
+from control_unit.register.register import Register
 
 
 class TypeCInstruction(Instruction):
@@ -12,4 +12,3 @@ class TypeCInstruction(Instruction):
 
     def _print_registers(self):
         return f"{self.immediate} {self.registerN} {self.registerD}"
-

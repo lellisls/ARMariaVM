@@ -1,4 +1,4 @@
-from instruction.instruction import Instruction
+from control_unit.instruction.instruction import Instruction
 
 
 class TypeGInstruction(Instruction):
@@ -10,4 +10,3 @@ class TypeGInstruction(Instruction):
 
     def _print_registers(self):
         return f"{self.condition} {self.offset}"
-
