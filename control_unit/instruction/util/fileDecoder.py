@@ -1,7 +1,7 @@
 import os
 
 from control_unit.instruction.decoder import BytecodeDecoder
-from file.programLoader import ProgramLoader
+from file.file_reader import FileReader
 
 
 class FileDecoder:
@@ -28,13 +28,13 @@ class FileDecoder:
 
     @classmethod
     def loadDecodedFile(cls, filename, print_=False):
-        loader = ProgramLoader(filename)
+        loader = FileReader(filename)
         encoded = loader.loadFile()
         return [cls.decode(inst, print_=True) for inst in encoded]
 
 
 if __name__ == '__main__':
-    file = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'program.txt')
+    file = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'data', 'program.txt')
 
     decoder = FileDecoder()
     instructions = decoder.loadDecodedFile(file)

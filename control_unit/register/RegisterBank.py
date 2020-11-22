@@ -1,3 +1,0 @@
-
-class RegisterBank:
-    pass
