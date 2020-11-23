@@ -8,7 +8,8 @@ class FileReader:
         self.data = "\n".join(self.file.readlines())
 
     def loadFileRaw(self):
-        return re.findall(r"(\d+) : ([0-1]+); -- (.*)", self.data)
+        rows = re.findall(r"(\d+) : ([0-1]+); -- (.*)", self.data)
+        return [(int(address), compressed, contexts) for address, compressed, contexts in rows]
 
     def loadFile(self):
         instructions = self.loadFileRaw()
