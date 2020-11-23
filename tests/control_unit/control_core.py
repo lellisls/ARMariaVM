@@ -1,2 +1,0 @@
-class ControlCore:
-    pass

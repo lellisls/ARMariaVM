@@ -98,8 +98,8 @@ class DecodingHelper:
 
     def decode_typeD(self, id_):
         RegD = self.get_value(3)
-        offset = self.get_value(8)
-        return TypeDInstruction(id_, names.get(id_), offset, RegD)
+        immediate = self.get_value(8)
+        return TypeDInstruction(id_, names.get(id_), immediate, RegD)
 
     def decode_typeE(self, id_):
         RegM = self.get_value(3)

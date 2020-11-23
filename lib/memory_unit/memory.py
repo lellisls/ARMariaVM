@@ -1,7 +1,12 @@
 import numpy
 
+from lib.control_unit.register import Register
+from lib.memory_unit.stack import Stack
+
 
 class Memory:
+    user_stack: Stack
+
     def __init__(self, size, width=32):
         self.max_address = 0
         self.size = size
@@ -34,3 +39,6 @@ class Memory:
             else:
                 output += f"{index: 4}: {value :016b}\n"
         return output
+
+    def setUserStack(self, reg_bank, register: Register, start: int, end: int):
+        self.user_stack = Stack(self, reg_bank, register, start, end)
