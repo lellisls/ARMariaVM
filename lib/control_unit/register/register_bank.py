@@ -1,26 +1,18 @@
-from lib.control_unit.register.register import Register
+from typing import Union
+
+from lib.control_unit.register import Register
 
 
 class RegisterBank:
     def __init__(self):
-        self.bank = dict({
-            Register.HeapArrayRegister: 0,
-            Register.AccumulatorRegister: 0,
-            Register.TemporaryRegister: 0,
-            Register.SecondRegister: 0,
-            Register.FramePointer: 0,
-            Register.GlobalPointer: 0,
-            Register.UserSPKeeper: 0,
-            Register.SystemCallRegister: 0,
-            Register.StoredSpecReg: 0,
-            Register.LinkRegister: 0,
-            Register.PCKeeper: 0,
-            Register.StackPointer: 0,
-            Register.ProgramCounter: 0,
-        })
+        self.bank = dict({})
+        for register in Register:
+            self.bank[register] = 0
 
-    def setRegister(self, reg: Register, value):
-        self.bank[reg] = value
+    def setRegister(self, reg: Union[Register, int], value):
+        reg = Register(reg)
+        self.bank[reg] = int(value)
 
-    def getRegister(self, reg: Register):
+    def getRegister(self, reg: Union[Register, int]):
+        reg = Register(reg)
         return self.bank[reg]
