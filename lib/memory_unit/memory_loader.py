@@ -9,8 +9,7 @@ class MemoryLoader:
     def loadFile(self, filename):
         fileReader = FileReader(filename)
         data = fileReader.loadFileRaw()
-        super().__init__(len(data))
         for (address, instruction, context) in data:
+            address = int(address)
             instruction = int(instruction, 2)
-            self.set(address, instruction)
-
+            self.memory.set(address, instruction)

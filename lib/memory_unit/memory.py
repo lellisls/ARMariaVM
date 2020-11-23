@@ -11,3 +11,6 @@ class Memory:
 
     def set(self, address, value):
         self.data[address] = value
+
+    def __str__(self):
+        return str(self.data)

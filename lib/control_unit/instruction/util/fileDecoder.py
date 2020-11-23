@@ -30,7 +30,7 @@ class FileDecoder:
     def loadDecodedFile(cls, filename, print_=False):
         loader = FileReader(filename)
         encoded = loader.loadFile()
-        return [cls.decode(inst, print_=True) for inst in encoded]
+        return [cls.decode(inst, print_) for inst in encoded]
 
 
 if __name__ == '__main__':

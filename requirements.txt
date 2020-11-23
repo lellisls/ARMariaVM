@@ -1,0 +1,6 @@
+# test
+tox
+coverage
+pytest
+pytest-cov
+pyyaml
