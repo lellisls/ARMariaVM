@@ -9,7 +9,7 @@ class FileReader:
 
     def loadFileRaw(self):
         rows = re.findall(r"(\d+) : ([0-1]+); -- (.*)", self.data)
-        return [(int(address), compressed, contexts) for address, compressed, contexts in rows]
+        return [(int(address) - 1, compressed, contexts) for address, compressed, contexts in rows]
 
     def loadFile(self):
         instructions = self.loadFileRaw()

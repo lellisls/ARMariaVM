@@ -21,7 +21,19 @@ def test_set_uint32_max(memory: Memory):
     assert value == value_32bit
 
 
-def test_set_uint64_max(memory: Memory):
+def test_set_uint64_overflow(memory: Memory):
     with pytest.raises(OverflowError):
         value_64bit = int('1' * 64, 2)
         memory.set(1000, value_64bit)
+
+
+def test_set_invalid_address_max(memory: Memory):
+    with pytest.raises(IndexError):
+        value_32bit = int('1' * 32, 2)
+        memory.set(3000, value_32bit)
+
+
+def test_set_invalid_address_negative(memory: Memory):
+    with pytest.raises(IndexError):
+        value_32bit = int('1' * 32, 2)
+        memory.set(-1, value_32bit)
