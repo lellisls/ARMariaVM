@@ -2,10 +2,15 @@ import numpy
 
 
 class Memory:
-    def __init__(self, size):
+    def __init__(self, size, width=32):
         self.max_address = 0
         self.size = size
-        self.data = numpy.zeros(size, numpy.uint32)
+        self.width = width
+
+        if width == 32:
+            self.data = numpy.zeros(size, numpy.uint32)
+        else:
+            self.data = numpy.zeros(size, numpy.uint16)
 
     @classmethod
     def _test_address(cls, address):
@@ -24,5 +29,8 @@ class Memory:
     def __str__(self):
         output = ""
         for index, value in enumerate(self.data[:self.max_address]):
-            output += f"{index: 4}: {value :032b}\n"
+            if self.width == 32:
+                output += f"{index: 4}: {value :032b}\n"
+            else:
+                output += f"{index: 4}: {value :016b}\n"
         return output

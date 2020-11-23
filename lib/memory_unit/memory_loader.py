@@ -6,6 +6,11 @@ class MemoryLoader:
     def __init__(self, memory: Memory):
         self.memory = memory
 
+    def loadBios(self, filename):
+        with open(filename) as file:
+            for address, inst in enumerate(file.readlines()):
+                self.memory.set(address, int(inst, 2))
+
     def loadFile(self, filename, split=False):
         fileReader = FileReader(filename)
         data = fileReader.loadFileRaw()

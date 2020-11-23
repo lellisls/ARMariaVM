@@ -9,10 +9,11 @@ bios_path = os.path.join(data_dir, 'bios.txt')
 # program_path = os.path.join(data_dir, 'program.txt')
 
 if __name__ == '__main__':
-    main_memory = Memory(32768)  # 128 K
-    memory_loader = MemoryLoader(main_memory)
-    memory_loader.loadFile(bios_path, split=True)
+    bios = Memory(pow(2, 9), 16)  # 512b
+    # main_memory = Memory(32768)  # 128k
+    bios_loader = MemoryLoader(bios)
+    bios_loader.loadBios(bios_path)
     # memory_loader.loadFile(program_path)
 
-    print("Memory:")
-    print(main_memory)
+    print("BIOS:")
+    print(bios)
