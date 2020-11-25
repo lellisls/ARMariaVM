@@ -1,5 +1,9 @@
 from enum import Enum
 
+from lib.control_unit.register.register_bank import RegisterBank
+
+reg_bank = RegisterBank()
+
 
 class Register(Enum):
     HeapArrayRegister = 0
@@ -33,6 +37,18 @@ class Register(Enum):
             self.ProgramCounter: "$PC",
         }
         return names.get(self)
+
+    def getValue(self):
+        return reg_bank.getRegister(self.value)
+
+    def setValue(self, value):
+        return reg_bank.setRegister(self.value, value)
+
+    def increment(self, increment=1):
+        return reg_bank.increment(self.value, increment)
+
+    def decrement(self, decrement=1):
+        return reg_bank.decrement(self.value, decrement)
 
     def __str__(self):
         return f"{self.shortName()}"

@@ -16,13 +16,12 @@ if __name__ == '__main__':
     bios = Memory(pow(2, 9), 16)  # 512b
     bios_loader = MemoryLoader(bios)
     bios_loader.loadBios(bios_path)
-    reg_bank = RegisterBank()
-    controller = MemoryController(reg_bank)
+    controller = MemoryController()
     memory_loader = MemoryLoader(controller.main_memory)
     memory_loader.loadFile(program_path, split=True)
 
-    reg_bank.setRegister(Register.ProgramCounter, 0)
-    core = ControlCore(reg_bank, controller)
+    Register.ProgramCounter.setValue(0)
+    core = ControlCore(controller)
 
     while core.running:
         core.iterate()
