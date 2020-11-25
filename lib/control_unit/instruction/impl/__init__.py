@@ -5,6 +5,7 @@ from .type_d_instruction import TypeDInstruction
 from .type_e_instruction import TypeEInstruction
 from .type_f_instruction import TypeFInstruction
 from .type_g_instruction import TypeGInstruction
+from .type_h_instruction import TypeHInstruction
 from .type_i_instruction import TypeIInstruction
 from .type_j_instruction import TypeJInstruction
 from .type_k_instruction import TypeKInstruction

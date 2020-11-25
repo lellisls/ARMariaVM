@@ -1,17 +1,42 @@
+import time
+from random import random
+
+from lib.alu import ALU
+from lib.barrel_shifter import BarrelShifter
 from lib.control_unit.instruction.instruction import Instruction
+from lib.control_unit.instruction.instruction_factory import InstructionFactory
 from lib.control_unit.register import RegisterBank, Register
-from lib.memory_unit import Memory
+from lib.control_unit.register.system_call import SystemCall
+from lib.memory_unit import MemoryController
+from lib.signal_extender import SignalExtender
 
 
 class ControlCore:
     inst: Instruction = None
 
-    def __init__(self, reg_bank: RegisterBank, main_memory: Memory):
+    def __init__(self, reg_bank: RegisterBank, memory_ctrl: MemoryController):
+        self.instruction_factory = InstructionFactory()
+        self.sig_ex = SignalExtender()
+        self.bs = BarrelShifter()
+        self.alu = ALU()
+
+        self.pc = None
+        self.running = True
+        self.next_pc = None
         self.reg_bank = reg_bank
+        self.memory_ctrl = memory_ctrl
 
-    def calculate(self, inst: Instruction):
-        self.inst = inst
+    def iterate(self):
+        self.pc = self.reg_bank.getRegister(Register.ProgramCounter)
+        self.next_pc = self.pc + 1
 
+        inst_code = self.memory_ctrl.main_memory.get(self.pc)
+        self.inst = self.instruction_factory.build(inst_code)
+        print(f"{self.pc: 4}: {self.inst}")
+        self.calculate()
+        self.reg_bank.setRegister(Register.ProgramCounter, self.next_pc)
+
+    def calculate(self):
         instructions = {
             1: self.inst1_lsl,
             2: self.inst2_lsr,
@@ -94,14 +119,16 @@ class ControlCore:
             79: self.inst79_bl,
             80: self.inst80_bx,
         }
-        handler = instructions.get(inst.id, self.unhandled_inst)
+        handler = instructions.get(self.inst.id, self.unhandled_inst)
         handler()
 
     def unhandled_inst(self):
-        raise RuntimeError("Unhandled instruction")
+        raise RuntimeError(f"Unhandled instruction: {self.inst}")
 
     def inst1_lsl(self):
-        self.unhandled_inst()
+        rm = self.reg_bank.getRegister(self.inst.registerM)
+        rd = self.bs.lsl(rm, self.inst.immediate)
+        self.reg_bank.setRegister(self.inst.registerD, rd)
 
     def inst2_lsr(self):
         self.unhandled_inst()
@@ -110,10 +137,16 @@ class ControlCore:
         self.unhandled_inst()
 
     def inst4_add(self):
-        self.unhandled_inst()
+        rn = self.reg_bank.getRegister(self.inst.registerN)
+        rm = self.reg_bank.getRegister(self.inst.registerM)
+        rd = self.alu.add_or_cmn(rn, rm)
+        self.reg_bank.setRegister(self.inst.registerD, rd)
 
     def inst5_sub(self):
-        self.unhandled_inst()
+        rn = self.reg_bank.getRegister(self.inst.registerN)
+        rm = self.reg_bank.getRegister(self.inst.registerM)
+        rd = self.alu.sub_or_cmp(rn, rm)
+        self.reg_bank.setRegister(self.inst.registerD, rd)
 
     def inst6_add(self):
         self.unhandled_inst()
@@ -128,7 +161,7 @@ class ControlCore:
         self.unhandled_inst()
 
     def inst10_add(self):
-        self.unhandled_inst()
+        self.reg_bank.increment(self.inst.registerD, self.inst.immediate)
 
     def inst11_sub(self):
         self.unhandled_inst()
@@ -164,7 +197,9 @@ class ControlCore:
         self.unhandled_inst()
 
     def inst22_cmp(self):
-        self.unhandled_inst()
+        lm = self.reg_bank.getRegister(self.inst.registerM)
+        ld = self.reg_bank.getRegister(self.inst.registerD)
+        self.alu.sub_or_cmp(lm, ld)
 
     def inst23_cmn(self):
         self.unhandled_inst()
@@ -173,7 +208,10 @@ class ControlCore:
         self.unhandled_inst()
 
     def inst25_mul(self):
-        self.unhandled_inst()
+        lm = self.reg_bank.getRegister(self.inst.registerM)
+        ld = self.reg_bank.getRegister(self.inst.registerD)
+        ld = self.alu.mul(ld, lm)
+        self.reg_bank.setRegister(self.inst.registerD, ld)
 
     def inst26_bic(self):
         self.unhandled_inst()
@@ -200,19 +238,27 @@ class ControlCore:
         self.unhandled_inst()
 
     def inst34_div(self):
-        self.unhandled_inst()
+        lm = self.reg_bank.getRegister(self.inst.registerM)
+        ld = self.reg_bank.getRegister(self.inst.registerD)
+        ld = self.alu.div(ld, lm)
+        self.reg_bank.setRegister(self.inst.registerD, ld)
 
     def inst35_mov(self):
-        self.unhandled_inst()
+        rm = self.reg_bank.getRegister(self.inst.registerM)
+        self.reg_bank.setRegister(self.inst.registerD, rm)
 
     def inst36_mov(self):
-        self.unhandled_inst()
+        rm = self.reg_bank.getRegister(self.inst.registerM)
+        self.reg_bank.setRegister(self.inst.registerD, rm)
 
     def inst37_mov(self):
-        self.unhandled_inst()
+        rm = self.reg_bank.getRegister(self.inst.registerM)
+        self.reg_bank.setRegister(self.inst.registerD, rm)
 
-    def inst38_br(self):
-        self.unhandled_inst()
+    def inst38_br(self):  # RELATIVE INDIRECT BRANCH
+        # TODO: use self.inst.condition
+        self.next_pc = self.pc + self.reg_bank.getRegister(self.inst.registerD)
+        pass
 
     def inst39_ldr(self):
         self.unhandled_inst()
@@ -242,10 +288,14 @@ class ControlCore:
         self.unhandled_inst()
 
     def inst48_str(self):
-        self.unhandled_inst()
+        ld = self.reg_bank.getRegister(self.inst.registerM)
+        lm = self.reg_bank.getRegister(self.inst.registerM)
+        self.memory_ctrl.main_memory.set(lm + self.inst.immediate, ld)
 
     def inst49_ldr(self):
-        self.unhandled_inst()
+        lm = self.reg_bank.getRegister(self.inst.registerM)
+        ld = self.memory_ctrl.main_memory.get(lm + self.inst.immediate)
+        self.reg_bank.setRegister(self.inst.registerD, ld)
 
     def inst50_strb(self):
         self.unhandled_inst()
@@ -266,26 +316,35 @@ class ControlCore:
         self.unhandled_inst()
 
     def inst56_add(self):
-        self.unhandled_inst()
+        pc = self.reg_bank.getRegister(Register.ProgramCounter)
+        rd = self.alu.add_or_cmn(pc, self.inst.immediate << 1)
+        self.reg_bank.setRegister(self.inst.registerD, rd)
 
     def inst57_add(self):
-        self.reg_bank.setRegister(self.inst.registerD,
-                                  self.inst.immediate * 2 + self.reg_bank.getRegister(Register.StackPointer))
+        sp = self.reg_bank.getRegister(Register.StackPointer)
+        rd = self.alu.add_or_cmn(sp, self.inst.immediate << 1)
+        self.reg_bank.setRegister(self.inst.registerD, rd)
 
     def inst58_cpxr(self):
         self.unhandled_inst()
 
     def inst59_sxth(self):
-        self.unhandled_inst()
+        rm = self.reg_bank.getRegister(self.inst.registerM)
+        rm = self.sig_ex.extend16(rm)
+        self.reg_bank.setRegister(self.inst.registerD, rm)
 
     def inst60_sxtb(self):
-        self.unhandled_inst()
+        rm = self.reg_bank.getRegister(self.inst.registerM)
+        rm = self.sig_ex.extend8(rm)
+        self.reg_bank.setRegister(self.inst.registerD, rm)
 
     def inst61_uxth(self):
-        self.unhandled_inst()
+        rm = self.reg_bank.getRegister(self.inst.registerM)
+        self.reg_bank.setRegister(self.inst.registerD, rm)
 
     def inst62_uxtb(self):
-        self.unhandled_inst()
+        rm = self.reg_bank.getRegister(self.inst.registerM)
+        self.reg_bank.setRegister(self.inst.registerD, rm)
 
     def inst63_rev(self):
         self.unhandled_inst()
@@ -300,22 +359,31 @@ class ControlCore:
         self.unhandled_inst()
 
     def inst67_push(self):
-        self.reg_bank.increment(Register.StackPointer)
+        rd = self.reg_bank.getRegister(self.inst.registerD)
+        self.memory_ctrl.push_user_stack(rd)
 
     def inst68_pop(self):
-        self.unhandled_inst()
+        value = self.memory_ctrl.pop_user_stack()
+        self.reg_bank.setRegister(self.inst.registerD, value)
 
     def inst69_output(self):
         self.unhandled_inst()
 
     def inst70_pause(self):
-        self.unhandled_inst()
+        # time.sleep(1)
+        pass
 
     def inst71_input(self):
-        self.unhandled_inst()
+        # value = int(input("INPUT: "))
+        value = int(random() * 10)
+        print(f"INPUT: {value} (random)")
+        self.reg_bank.setRegister(self.inst.registerD, value)
 
-    def inst72_swi(self):
-        self.unhandled_inst()
+    def inst72_swi(self):  # Software interruption
+        print(f"Interruption: {SystemCall(self.inst.immediate)}")
+        if SystemCall.ProgramCompletion == SystemCall(self.inst.immediate):
+            self.running = False
+            self.next_pc = -1
 
     def inst73_b(self):
         self.unhandled_inst()
@@ -330,13 +398,17 @@ class ControlCore:
         self.unhandled_inst()
 
     def inst77_pushm(self):
-        self.unhandled_inst()
+        self.reg_bank.increment(Register.StackPointer, self.inst.immediate)
 
     def inst78_popm(self):
-        self.unhandled_inst()
+        self.reg_bank.decrement(Register.StackPointer, self.inst.immediate)
 
-    def inst79_bl(self):
-        self.unhandled_inst()
+    def inst79_bl(self):  # RELATIVE INDIRECT BRANCH
+        self.reg_bank.setRegister(Register.LinkRegister, self.pc)
+        rd = self.reg_bank.getRegister(self.inst.registerD)
+        self.next_pc = self.pc + rd
+        pass
 
-    def inst80_bx(self):
-        self.unhandled_inst()
+    def inst80_bx(self):  # ABSOLUTE INDIRECT BRANCH
+        self.next_pc = self.reg_bank.getRegister(self.inst.immediate)
+        pass

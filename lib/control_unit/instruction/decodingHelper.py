@@ -104,6 +104,16 @@ class DecodingHelper:
     def decode_typeE(self, id_):
         RegM = self.get_value(3)
         RegD = self.get_value(3)
+
+        if id_ in [29, 30, 32, 36, 37]:
+            RegD = RegD + 8
+
+        if id_ in [28, 30, 31, 33, 35, 37]:
+            RegM = RegM + 8
+
+        if id_ == 33:
+            RegD = RegD & 7
+
         return TypeEInstruction(id_, names.get(id_), RegM, RegD)
 
     def decode_typeF(self, id_, cond):
@@ -118,7 +128,7 @@ class DecodingHelper:
     def decode_typeH(self, id_):
         self.get_value(2)
         RegD = self.get_value(4)
-        return TypeGInstruction(id_, names.get(id_), RegD)
+        return TypeHInstruction(id_, names.get(id_), RegD)
 
     def decode_typeJ(self, id_):
         self.get_value(4)  # 00000
@@ -131,5 +141,5 @@ class DecodingHelper:
         return TypeKInstruction(id_, names.get(id_), RegD)
 
     def decode_typeI(self, id_):
-        RegD = self.get_value(7)
-        return TypeIInstruction(id_, names.get(id_), RegD)
+        immediate = self.get_value(7)
+        return TypeIInstruction(id_, names.get(id_), immediate)

@@ -70,6 +70,8 @@ class ALU:
     def div(self, a: int, b: int):
         """Division"""
         self.overflow = b == 0
+        if self.overflow:
+            return 0
         return self._value(int(a / b))
 
     def rest(self, a: int, b: int):

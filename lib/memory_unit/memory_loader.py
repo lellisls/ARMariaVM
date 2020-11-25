@@ -11,16 +11,17 @@ class MemoryLoader:
             for address, inst in enumerate(file.readlines()):
                 self.memory.set(address, int(inst, 2))
 
-    def loadFile(self, filename, split=False):
+    def loadFile(self, filename, split=False, start_address=0):
         fileReader = FileReader(filename)
         data = fileReader.loadFileRaw()
+        index = 0
         for (address, instruction, context) in data:
-            address = int(address)
             mid = int(len(instruction) / 2)
             inst1, inst2 = int(instruction[:mid], 2), int(instruction[mid:], 2)
             if split:
-                self.memory.set(address * 2, inst1)
-                self.memory.set(address * 2 + 1, inst2)
+                self.memory.set(start_address + index * 2, inst1)
+                self.memory.set(start_address + index * 2 + 1, inst2)
             else:
                 instruction = int(instruction, 2)
-                self.memory.set(address, instruction)
+                self.memory.set(start_address + index, instruction)
+            index += 1
