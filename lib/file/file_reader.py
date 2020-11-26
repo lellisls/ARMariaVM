@@ -32,5 +32,5 @@ class FileReader:
 
 if __name__ == '__main__':
     loader = FileReader(os.path.join(os.path.dirname(__file__), "..", '..', "data", "program.txt"))
-    print(loader.loadFile())
-    print(loader.loadFileRaw())
+    console.info(loader.loadFile())
+    console.info(loader.loadFileRaw())

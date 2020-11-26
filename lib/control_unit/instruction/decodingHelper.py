@@ -61,7 +61,7 @@ class DecodingHelper:
         length = len(self.instruction)
         assert length >= bits
         self.value_raw = value = self.instruction[:bits]
-        # print(f"{self.instruction} : {length} - {bits} : {value}")
+        # console.info(f"{self.instruction} : {length} - {bits} : {value}")
         self.instruction = self.instruction[bits:]
         assert len(self.instruction) == (length - bits)
         return value

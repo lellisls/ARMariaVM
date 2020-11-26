@@ -1,3 +1,4 @@
+import logging
 from random import random
 
 from lib.alu import ALU
@@ -9,9 +10,14 @@ from lib.control_unit.system_call import SystemCall
 from lib.memory_unit import MemoryController
 from lib.signal_extender import SignalExtender
 
+console = logging.getLogger(__name__)
+
 
 class ControlCore:
     inst: Instruction = None
+    pc = None
+    running = True
+    next_pc = None
 
     def __init__(self, memory_ctrl: MemoryController):
         self.instruction_factory = InstructionFactory()
@@ -19,18 +25,26 @@ class ControlCore:
         self.bs = BarrelShifter()
         self.alu = ALU()
 
+        self.memory_ctrl = memory_ctrl
+        self.reset()
+
+    def reset(self):
         self.pc = None
         self.running = True
         self.next_pc = None
-        self.memory_ctrl = memory_ctrl
+
+        for reg in Register:
+            reg.setValue(0)
+        self.memory_ctrl.reset()
 
     def iterate(self):
         self.pc = Register.ProgramCounter.getValue()
         self.next_pc = self.pc + 1
 
-        inst_code = self.memory_ctrl.main_memory.get(self.pc)
+        inst_code = self.memory_ctrl.get_data(self.pc)
         self.inst = self.instruction_factory.build(inst_code)
-        print(f"{self.pc: 4}: {self.inst}")
+        console.info(f"\n{self.pc: 4}: {self.inst}")
+
         self.calculate()
         Register.ProgramCounter.setValue(self.next_pc)
 
@@ -159,7 +173,7 @@ class ControlCore:
         self.unhandled_inst()
 
     def inst10_add(self):
-        self.inst.registerD.increment( self.inst.immediate)
+        self.inst.registerD.increment(self.inst.immediate)
 
     def inst11_sub(self):
         self.unhandled_inst()
@@ -286,13 +300,14 @@ class ControlCore:
         self.unhandled_inst()
 
     def inst48_str(self):
-        ld = self.inst.registerM.getValue()
+        self.running = False
+        ld = self.inst.registerD.getValue()
         lm = self.inst.registerM.getValue()
-        self.memory_ctrl.main_memory.set(lm + self.inst.immediate, ld)
+        self.memory_ctrl.set_data(lm + self.inst.immediate, ld)
 
     def inst49_ldr(self):
         lm = self.inst.registerM.getValue()
-        ld = self.memory_ctrl.main_memory.get(lm + self.inst.immediate)
+        ld = self.memory_ctrl.get_data(lm + self.inst.immediate)
         self.inst.registerD.setValue(ld)
 
     def inst50_strb(self):
@@ -319,7 +334,7 @@ class ControlCore:
         self.inst.registerD.setValue(rd)
 
     def inst57_add(self):
-        sp = Register.StackPointer.getValue()
+        sp = Register.UserSPKeeper.getValue()
         rd = self.alu.add_or_cmn(sp, self.inst.immediate << 1)
         self.inst.registerD.setValue(rd)
 
@@ -368,17 +383,17 @@ class ControlCore:
         self.unhandled_inst()
 
     def inst70_pause(self):
-        # time.sleep(1)
+        # self.running = False
         pass
 
     def inst71_input(self):
         # value = int(input("INPUT: "))
         value = int(random() * 10)
-        print(f"INPUT: {value} (random)")
+        console.info(f"INPUT: {value} (random)")
         self.inst.registerD.setValue(value)
 
     def inst72_swi(self):  # Software interruption
-        print(f"Interruption: {SystemCall(self.inst.immediate)}")
+        console.info(f"Interruption: {SystemCall(self.inst.immediate)}")
         if SystemCall.ProgramCompletion == SystemCall(self.inst.immediate):
             self.running = False
             self.next_pc = -1
@@ -396,10 +411,10 @@ class ControlCore:
         self.unhandled_inst()
 
     def inst77_pushm(self):
-        Register.StackPointer.increment( self.inst.immediate)
+        self.memory_ctrl.push_user_stack_multiple(self.inst.immediate)
 
     def inst78_popm(self):
-        Register.StackPointer.decrement( self.inst.immediate)
+        self.memory_ctrl.pop_user_stack_multiple(self.inst.immediate)
 
     def inst79_bl(self):  # RELATIVE INDIRECT BRANCH
         Register.LinkRegister.setValue(self.pc)
@@ -408,5 +423,5 @@ class ControlCore:
         pass
 
     def inst80_bx(self):  # ABSOLUTE INDIRECT BRANCH
-        self.next_pc = self.inst.immediate.getValue()
+        self.next_pc = self.inst.immediate
         pass

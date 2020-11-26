@@ -1,12 +1,8 @@
-from typing import Union
-
-
 class RegisterBank:
     def __init__(self):
         self.bank = dict({})
 
     def setRegister(self, reg: int, value):
-        print(f"{reg} = {value}")
         self.bank[reg] = int(value)
         return int(value)
 

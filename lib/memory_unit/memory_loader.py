@@ -16,8 +16,13 @@ class MemoryLoader:
         data = fileReader.loadFileRaw()
         index = 0
         for (address, instruction, context) in data:
+            print(instruction)
             mid = int(len(instruction) / 2)
             inst1, inst2 = int(instruction[:mid], 2), int(instruction[mid:], 2)
+
+            if "size" in context:
+                pass
+
             if split:
                 self.memory.set(start_address + index * 2, inst1)
                 self.memory.set(start_address + index * 2 + 1, inst2)

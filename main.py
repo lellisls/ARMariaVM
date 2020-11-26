@@ -1,10 +1,18 @@
+import logging
 import os
 
 from lib.control_unit.control_core import ControlCore
 from lib.control_unit.instruction.instruction_factory import InstructionFactory
-from lib.control_unit.register import RegisterBank, Register
+from lib.control_unit.register import Register
 from lib.memory_unit import Memory, MemoryController
 from lib.memory_unit.memory_loader import MemoryLoader
+from ui.log_handler import LogHandler
+from ui.main_window import MainWindow
+
+format_ = '%(message)s'
+
+logging.basicConfig(level=logging.INFO, format=format_)
+logger = logging.getLogger()
 
 factory = InstructionFactory()
 main_dir = os.path.dirname(__file__)
@@ -13,6 +21,11 @@ bios_path = os.path.join(data_dir, 'bios.txt')
 program_path = os.path.join(data_dir, 'program.txt')
 
 if __name__ == '__main__':
+    window = MainWindow()
+    log_handler = LogHandler(window.print_console)
+    log_handler.setLevel(logging.INFO)
+    logger.addHandler(log_handler)
+
     bios = Memory(pow(2, 9), 16)  # 512b
     bios_loader = MemoryLoader(bios)
     bios_loader.loadBios(bios_path)
@@ -21,15 +34,16 @@ if __name__ == '__main__':
     memory_loader.loadFile(program_path, split=True)
 
     Register.ProgramCounter.setValue(0)
+
     core = ControlCore(controller)
 
-    while core.running:
-        core.iterate()
+    window.run(core)
+    core.running = False
 
-    # print("RUNNING BIOS:")
+    # console.info("RUNNING BIOS:")
     # for idx, inst in enumerate(bios.data):
     #     inst = f"{inst:016b}"
     #     inst = factory.build(inst)
-    #     print(f"{idx: 4}: {inst}")
+    #     console.info(f"{idx: 4}: {inst}")
     #     code.inst = inst
     #     core.calculate()

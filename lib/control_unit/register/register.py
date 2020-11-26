@@ -1,6 +1,9 @@
+import logging
 from enum import Enum
 
 from lib.control_unit.register.register_bank import RegisterBank
+
+console = logging.getLogger(__name__)
 
 reg_bank = RegisterBank()
 
@@ -22,19 +25,19 @@ class Register(Enum):
 
     def shortName(self):
         names = {
-            self.HeapArrayRegister: "$H0",
-            self.AccumulatorRegister: "$A0",
-            self.TemporaryRegister: "$T1",
-            self.SecondRegister: "$SXR",
-            self.FramePointer: "$FP",
-            self.GlobalPointer: "$GP",
-            self.UserSPKeeper: "$USPK",
-            self.SystemCallRegister: "$SC",
-            self.StoredSpecReg: "$SXR",
-            self.LinkRegister: "$LR",
-            self.PCKeeper: "$PCK",
-            self.StackPointer: "$SP",
-            self.ProgramCounter: "$PC",
+            self.HeapArrayRegister: "H0",
+            self.AccumulatorRegister: "A0",
+            self.TemporaryRegister: "T1",
+            self.SecondRegister: "SXR",
+            self.FramePointer: "FP",
+            self.GlobalPointer: "GP",
+            self.UserSPKeeper: "USPK",
+            self.SystemCallRegister: "SC",
+            self.StoredSpecReg: "SXR",
+            self.LinkRegister: "LR",
+            self.PCKeeper: "PCK",
+            self.StackPointer: "SP",
+            self.ProgramCounter: "PC",
         }
         return names.get(self)
 
@@ -42,13 +45,18 @@ class Register(Enum):
         return reg_bank.getRegister(self.value)
 
     def setValue(self, value):
+        console.info(f"\t{self} = {value}")
         return reg_bank.setRegister(self.value, value)
 
     def increment(self, increment=1):
-        return reg_bank.increment(self.value, increment)
+        val = reg_bank.increment(self.value, increment)
+        console.info(f"\t{self} = {val}")
+        return val
 
     def decrement(self, decrement=1):
-        return reg_bank.decrement(self.value, decrement)
+        val = reg_bank.decrement(self.value, decrement)
+        console.info(f"\t{self} = {val}")
+        return val
 
     def __str__(self):
-        return f"{self.shortName()}"
+        return f"${self.shortName()}"""
