@@ -11,7 +11,7 @@ from ui.main_window import MainWindow
 
 format_ = '%(message)s'
 
-logging.basicConfig(level=logging.INFO, format=format_)
+logging.basicConfig(level=logging.DEBUG, format=format_)
 logger = logging.getLogger()
 
 factory = InstructionFactory()
@@ -23,7 +23,7 @@ program_path = os.path.join(data_dir, 'program.txt')
 if __name__ == '__main__':
     window = MainWindow()
     log_handler = LogHandler(window.print_console)
-    log_handler.setLevel(logging.INFO)
+    log_handler.setLevel(level=logging.DEBUG)
     logger.addHandler(log_handler)
 
     bios = Memory(pow(2, 9), 16)  # 512b
@@ -40,10 +40,10 @@ if __name__ == '__main__':
     window.run(core)
     core.running = False
 
-    # console.info("RUNNING BIOS:")
+    # console.debug("RUNNING BIOS:")
     # for idx, inst in enumerate(bios.data):
     #     inst = f"{inst:016b}"
     #     inst = factory.build(inst)
-    #     console.info(f"{idx: 4}: {inst}")
+    #     console.debug(f"{idx: 4}: {inst}")
     #     code.inst = inst
     #     core.calculate()

@@ -45,17 +45,17 @@ class Register(Enum):
         return reg_bank.getRegister(self.value)
 
     def setValue(self, value):
-        console.info(f"\t{self} = {value}")
+        console.debug(f"\t{self} = {value}")
         return reg_bank.setRegister(self.value, value)
 
     def increment(self, increment=1):
         val = reg_bank.increment(self.value, increment)
-        console.info(f"\t{self} = {val}")
+        console.debug(f"\t{self} = {val}")
         return val
 
     def decrement(self, decrement=1):
         val = reg_bank.decrement(self.value, decrement)
-        console.info(f"\t{self} = {val}")
+        console.debug(f"\t{self} = {val}")
         return val
 
     def __str__(self):

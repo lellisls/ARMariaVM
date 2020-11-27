@@ -46,7 +46,7 @@ class ControlCore:
 
         ctx = self.memory_ctrl.main_memory.get_context(self.pc)
         ctx = f" - {ctx}" if ctx != "" else ""
-        console.info(f"\n{self.pc: 4}: {self.inst}{ctx}")
+        console.debug(f"\n{self.pc: 4}: {self.inst}{ctx}")
 
         self.calculate()
         Register.ProgramCounter.setValue(self.next_pc)
@@ -271,9 +271,13 @@ class ControlCore:
         self.inst.registerD.setValue(rm)
 
     def inst38_br(self):  # RELATIVE INDIRECT BRANCH
-        # TODO: use self.inst.condition
-        self.next_pc = self.pc + self.inst.registerD.getValue()
-        pass
+        condition = self.inst.condition.getResult(self.alu)
+
+        if condition:
+            console.debug("\tTake branch")
+            self.next_pc = self.pc + self.inst.registerD.getValue()
+        else:
+            console.debug("\tNot take branch")
 
     def inst39_ldr(self):
         self.unhandled_inst()
@@ -383,7 +387,7 @@ class ControlCore:
 
     def inst69_output(self):
         rd = self.inst.registerD.getValue()
-        console.info(f"OUTPUT: {rd}")
+        console.info(f"\tOUTPUT: {rd}")
 
     def inst70_pause(self):
         # self.running = False
@@ -392,11 +396,11 @@ class ControlCore:
     def inst71_input(self):
         # value = int(input("INPUT: "))
         value = int(random() * 10)
-        console.info(f"INPUT: {value} (random)")
+        console.info(f"\tINPUT: {value} (random)")
         self.inst.registerD.setValue(value)
 
     def inst72_swi(self):  # Software interruption
-        console.info(f"Interruption: {SystemCall(self.inst.immediate)}")
+        console.info(f"\tInterruption: {SystemCall(self.inst.immediate)}")
         if SystemCall.ProgramCompletion == SystemCall(self.inst.immediate):
             self.running = False
             self.next_pc = self.pc

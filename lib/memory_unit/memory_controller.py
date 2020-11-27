@@ -23,35 +23,35 @@ class MemoryController:
         self.os_end = 4095
 
     def set_data(self, address, value):
-        console.info(f"\tMEMORY[{address}] = {value}")
+        console.debug(f"\tMEMORY[{address}] = {value}")
         self.main_memory.set(address, value)
 
     def get_data(self, address):
         return self.main_memory.get(address)
 
     def push_user_stack(self, value):
-        console.info(f"\tPUSH USER << {value}")
+        console.debug(f"\tPUSH USER << {value}")
         self.user_stack.push(value)
 
     def push_user_stack_multiple(self, increment):
-        console.info(f"\tPUSH USER by {increment}")
+        console.debug(f"\tPUSH USER by {increment}")
         self.user_stack.pushM(increment)
 
     def pop_user_stack(self):
         value = self.user_stack.pop()
-        console.info(f"\tPOP USER << {value}")
+        console.debug(f"\tPOP USER << {value}")
         return value
 
     def pop_user_stack_multiple(self, increment):
         self.user_stack.popM(increment)
-        console.info(f"\tPOP USER by {increment}")
+        console.debug(f"\tPOP USER by {increment}")
 
     def push_kernel_stack(self, value):
-        console.info(f"\tPUSH KERNEL << {value}")
+        console.debug(f"\tPUSH KERNEL << {value}")
         self.privileged_stack.push(value)
 
     def push_kernel_stack_multiple(self, increment):
-        console.info(f"\tPUSH KERNEL by {increment}")
+        console.debug(f"\tPUSH KERNEL by {increment}")
         self.privileged_stack.pushM(increment)
 
     def reset(self):

@@ -15,7 +15,7 @@ class FileDecoder:
             decoder = BytecodeDecoder(bytecode)
             result = decoder.decode()
             if print_:
-                console.info(f"({result.id:2})  {result.name:6} : {context.strip()}")
+                console.debug(f"({result.id:2})  {result.name:6} : {context.strip()}")
             result.line_no = line_no
             result.context = context
 
@@ -25,8 +25,8 @@ class FileDecoder:
                 raise RuntimeError(f"Name {result.name} not in context: {context}")
             return result
         except RuntimeError as e:
-            console.info(f"Error while decoding {bytecode}: {e}")
-            console.info(f"Context: {line_no}: {bytecode} -- {context}")
+            console.debug(f"Error while decoding {bytecode}: {e}")
+            console.debug(f"Context: {line_no}: {bytecode} -- {context}")
             raise e
 
     @classmethod
