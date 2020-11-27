@@ -31,7 +31,7 @@ if __name__ == '__main__':
     bios_loader.loadBios(bios_path)
     controller = MemoryController()
     memory_loader = MemoryLoader(controller.main_memory)
-    memory_loader.loadFile(program_path, split=True)
+    memory_loader.loadFile(program_path, split=False)
 
     Register.ProgramCounter.setValue(0)
 

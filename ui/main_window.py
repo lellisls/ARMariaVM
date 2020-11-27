@@ -13,6 +13,7 @@ class MainWindow:
     core: ControlCore
 
     def __init__(self):
+        self.last_change = -1
         self.window = Tk()
 
         self.window.title("ARMaria VM")
@@ -54,17 +55,24 @@ class MainWindow:
 
     def print_memory(self, text):
         lines = text.split('\n')
-        self.memory.insert('1.0', f"{text}\n")
-        self.memory.delete(f"{len(lines)}.0", END)
-        for index, line in enumerate(lines):
-            if "<<<" in line:
-                self.memory.see(f"{index + 1}.0")
-                break
 
-    def iterate(self):
+        change_idx = -1
+        for index, line in enumerate(lines):
+            if "<<<" in line and index != self.last_change:
+                change_idx = index
+                self.last_change = change_idx
+
+            self.memory.insert('1.0', f"{text}\n")
+            self.memory.delete(f"{len(lines)}.0", END)
+
+        if change_idx > 0:
+            self.memory.see(f"{change_idx + 1}.0")
+
+    def iterate(self, auto=False):
         try:
             self.core.iterate()
-            self.update_data()
+            if not (auto and self.core.running):
+                self.update_data()
         except Exception as e:
             self.core.running = False
             console.error(f"\n\n!!! EXCEPTION: {e} !!!")
@@ -75,7 +83,8 @@ class MainWindow:
 
         def runner():
             while self.core.running:
-                self.iterate()
+                self.iterate(auto=True)
+            self.update_data()
 
         control_thread = Thread(target=runner, daemon=True)
         control_thread.start()
@@ -87,6 +96,7 @@ class MainWindow:
         self.core.reset()
         self.console.delete('1.0', END)
         self.update_data()
+        self.last_change = -1
 
     def update_data(self):
         self.print_memory(str(self.core.memory_ctrl))

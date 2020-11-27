@@ -17,7 +17,7 @@ class SignalExtender:
             return int(value, 2)
 
         neg = int(cls._neg(value), 2)
-        return - (neg - 1)
+        return - (neg + 1)
 
     @classmethod
     def _neg(cls, value):

@@ -1,5 +1,7 @@
 import logging
+import re
 
+from lib.control_unit.instruction.instruction_factory import InstructionFactory
 from lib.control_unit.register import Register
 from lib.memory_unit import Memory
 from lib.memory_unit.stack import Stack
@@ -11,6 +13,7 @@ class MemoryController:
     user_stack_end = 8191
 
     def __init__(self):
+        self.inst_factory = InstructionFactory()
         self.main_memory = Memory(32768)  # 128k
         self.privileged_stack = Stack(self.main_memory, Register.StackPointer, 4096, 6143)
         self.user_stack = Stack(self.main_memory, Register.UserSPKeeper, 6144, 8191)
@@ -59,6 +62,8 @@ class MemoryController:
         output = ""
         last = 0
         count = 0
+        index = 0
+
         for index, value in enumerate(self.main_memory.data):
             flags = self.print_flags(index)
             mark = self.print_mark(index)
@@ -86,6 +91,8 @@ class MemoryController:
         return output
 
     def display_value(self, index, value):
+        if index < 2048:
+            return self.display_inst(index, value)
         if self.main_memory.width == 32:
             return f"{index: 6}: {value :032b} = {value : 6}{self.print_flags(index)}\n"
         else:
@@ -112,7 +119,7 @@ class MemoryController:
 
     @classmethod
     def print_text(cls, index, text):
-        return f"{index: 6}: ======= {text} =======\n"
+        return f"{index: 6}: =========== {text :^17} ===========\n"
 
     def print_flags(self, index):
         reg = ""
@@ -129,3 +136,9 @@ class MemoryController:
             return " <- " + reg
 
         return ""
+
+    def display_inst(self, index, value):
+        ctx = self.main_memory.get_context(index)
+        ctx = f" - {ctx}" if ctx != "" else ""
+        decoded = self.inst_factory.build(value)
+        return f"{index: 6}: {str(decoded) :^20} {self.print_flags(index):10}{ctx}\n"

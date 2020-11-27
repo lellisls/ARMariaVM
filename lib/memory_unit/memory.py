@@ -7,6 +7,7 @@ console = logging.getLogger(__name__)
 
 class Memory:
     def __init__(self, size, width=32):
+        self.context = dict()
         self.max_address = 0
         self.size = size
         self.width = width
@@ -32,3 +33,11 @@ class Memory:
         self.last_modified = address
 
         self.data[address] = value
+
+    def set_context(self, address, value: str):
+        value = value.strip()
+        if value != "":
+            self.context[address] = value
+
+    def get_context(self, index):
+        return self.context.get(index, "")

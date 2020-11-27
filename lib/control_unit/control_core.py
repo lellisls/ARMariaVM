@@ -43,7 +43,10 @@ class ControlCore:
 
         inst_code = self.memory_ctrl.get_data(self.pc)
         self.inst = self.instruction_factory.build(inst_code)
-        console.info(f"\n{self.pc: 4}: {self.inst}")
+
+        ctx = self.memory_ctrl.main_memory.get_context(self.pc)
+        ctx = f" - {ctx}" if ctx != "" else ""
+        console.info(f"\n{self.pc: 4}: {self.inst}{ctx}")
 
         self.calculate()
         Register.ProgramCounter.setValue(self.next_pc)
@@ -300,7 +303,6 @@ class ControlCore:
         self.unhandled_inst()
 
     def inst48_str(self):
-        self.running = False
         ld = self.inst.registerD.getValue()
         lm = self.inst.registerM.getValue()
         self.memory_ctrl.set_data(lm + self.inst.immediate, ld)
@@ -380,7 +382,8 @@ class ControlCore:
         self.inst.registerD.setValue(value)
 
     def inst69_output(self):
-        self.unhandled_inst()
+        rd = self.inst.registerD.getValue()
+        console.info(f"OUTPUT: {rd}")
 
     def inst70_pause(self):
         # self.running = False
@@ -396,7 +399,7 @@ class ControlCore:
         console.info(f"Interruption: {SystemCall(self.inst.immediate)}")
         if SystemCall.ProgramCompletion == SystemCall(self.inst.immediate):
             self.running = False
-            self.next_pc = -1
+            self.next_pc = self.pc
 
     def inst73_b(self):
         self.unhandled_inst()
@@ -417,11 +420,11 @@ class ControlCore:
         self.memory_ctrl.pop_user_stack_multiple(self.inst.immediate)
 
     def inst79_bl(self):  # RELATIVE INDIRECT BRANCH
-        Register.LinkRegister.setValue(self.pc)
+        Register.LinkRegister.setValue(self.pc + 1)
         rd = self.inst.registerD.getValue()
         self.next_pc = self.pc + rd
         pass
 
     def inst80_bx(self):  # ABSOLUTE INDIRECT BRANCH
-        self.next_pc = self.inst.immediate
+        self.next_pc = self.inst.registerD.getValue()
         pass

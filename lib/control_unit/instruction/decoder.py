@@ -93,12 +93,9 @@ class BytecodeDecoder:
         if self.decoder.func2 == 1:  # 79 BL - 80 BX
             self.decoder.get_opbit()
 
-            if self.decoder.op:
-                id_ = 80
-                decoded = self.decoder.decode_typeI(id_)
-            else:
-                id_ = 79
-                decoded = self.decoder.decode_typeK(id_)
+            id_ = 80 if self.decoder.op else 79
+
+            decoded = self.decoder.decode_typeK(id_)
 
             decoded.registerA = self.PC_REGISTER
             decoded.registerB = self.LINK_REGISTER
