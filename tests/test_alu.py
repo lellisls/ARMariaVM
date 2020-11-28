@@ -55,6 +55,8 @@ def test_adc(alu: ALU):
     assert alu.adc(1, 2) == 4
     assert alu.adc(max_32_bits, 0) == 1
     assert alu.carry == 1
+    assert alu.adc(max_32_bits, 1) == 2
+    assert alu.carry == 1
     assert alu.adc(min_32_bits, -2) == -1
     assert alu.carry == 1
 
@@ -91,10 +93,35 @@ def test_bic(alu: ALU):
 
 def test_sub_or_cmp(alu: ALU):
     assert alu.sub_or_cmp(1, 2) == -1
+
     assert alu.sub_or_cmp(min_32_bits, 1) == -1
     assert alu.carry == 1
+
     assert alu.sub_or_cmp(max_32_bits, -10) == 10
     assert alu.carry == 1
+
+    assert alu.sub_or_cmp(0, 0) == 0
+    assert alu.zero == 1
+
+    assert alu.sub_or_cmp(1, 1) == 0
+    assert alu.zero == 1
+
+    assert alu.sub_or_cmp(-1, -1) == 0
+    assert alu.zero == 1
+
+
+def test_bitwise_or(alu: ALU):
+    assert alu.bitwise_or(2, 2) == 0
+    assert alu.zero == 1
+    assert alu.carry == 0
+    assert alu.overflow == 0
+    assert alu.negative == 0
+
+    assert alu.bitwise_or(-1, -1) == 0
+    assert alu.zero == 1
+    assert alu.carry == 0
+    assert alu.overflow == 0
+    assert alu.negative == 0
 
 
 def test_neg(alu: ALU):

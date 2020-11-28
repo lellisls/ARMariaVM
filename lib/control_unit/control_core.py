@@ -1,5 +1,4 @@
 import logging
-from random import random
 
 from lib.alu import ALU
 from lib.barrel_shifter import BarrelShifter
@@ -36,6 +35,7 @@ class ControlCore:
         for reg in Register:
             reg.setValue(0)
         self.memory_ctrl.reset()
+        self.values = [2, 4]
 
     def iterate(self):
         self.pc = Register.ProgramCounter.getValue()
@@ -272,10 +272,11 @@ class ControlCore:
 
     def inst38_br(self):  # RELATIVE INDIRECT BRANCH
         condition = self.inst.condition.getResult(self.alu)
+        rd = self.inst.registerD.getValue()
 
         if condition:
-            console.debug("\tTake branch")
-            self.next_pc = self.pc + self.inst.registerD.getValue()
+            console.debug(f"\tTake branch {self.pc} + {rd}")
+            self.next_pc = self.pc + rd
         else:
             console.debug("\tNot take branch")
 
@@ -395,8 +396,11 @@ class ControlCore:
 
     def inst71_input(self):
         # value = int(input("INPUT: "))
-        value = int(random() * 10)
-        console.info(f"\tINPUT: {value} (random)")
+        value = self.values.pop()
+        console.info(f"\tINPUT: {value}")
+
+        # value = int(random() * 10)
+        # console.info(f"\tINPUT: {value} (random)")
         self.inst.registerD.setValue(value)
 
     def inst72_swi(self):  # Software interruption
