@@ -44,8 +44,7 @@ class MainWindow:
         self.btn_frame = Frame(self.window)
 
         self.next_btn = Button(self.btn_frame, text="Next", command=self.iterate).pack(side=LEFT)
-        self.play_btn = Button(self.btn_frame, text="Play", command=self.play).pack(side=LEFT)
-        self.pause_btn = Button(self.btn_frame, text="Pause", command=self.pause).pack(side=LEFT)
+        self.play_pause_btn = Button(self.btn_frame, text="Play/Pause", command=self.play_pause).pack(side=LEFT)
         self.play_btn = Button(self.btn_frame, text="Reset", command=self.reset).pack(side=LEFT)
 
         self._disable_textfield(self.console)
@@ -65,10 +64,7 @@ class MainWindow:
         elif event.char == 'f':
             self.window.state('zoomed')
         elif event.keysym == 'space':
-            if self.core.running:
-                self.pause()
-            else:
-                self.play()
+            self.play_pause()
 
     def _disable_textfield(self, field):
         field.bind('<Key>', self.key_tracker.report_key_press)
@@ -104,20 +100,28 @@ class MainWindow:
             raise e
 
     def play(self):
-        self.core.running = True
 
         def runner():
+            self.core.running = True
             try:
                 while self.core.running:
                     self.iterate(auto=True)
-            finally:
+            except Exception as e:
+                self.core.running = False
                 self.update_data()
+                raise e
 
         self.control_thread = Thread(target=runner, daemon=True)
         self.control_thread.start()
 
     def pause(self):
         self.core.running = False
+
+    def play_pause(self):
+        if self.core.running:
+            self.play()
+        else:
+            self.pause()
 
     def reset(self):
         self.core.running = False

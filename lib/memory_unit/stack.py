@@ -17,6 +17,7 @@ class Stack:
     def push(self, value: int):
         next_idx = self.pushM(1)
         self.main_memory.set(next_idx, value)
+        return (next_idx, value)
 
     def pushM(self, increment):
         # if self.register.getValue() <= self.start:

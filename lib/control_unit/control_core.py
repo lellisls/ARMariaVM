@@ -359,7 +359,7 @@ class ControlCore:
         self.inst.registerD.setValue(rd)
 
     def inst57_add(self):
-        sp = Register.UserSPKeeper.getValue()
+        sp = Register.StackPointer.getValue()
         rd = self.alu.add_or_cmn(sp, self.inst.immediate << 1)
         self.inst.registerD.setValue(rd)
 

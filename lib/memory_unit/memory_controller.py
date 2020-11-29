@@ -29,8 +29,9 @@ class MemoryController:
         return self.main_memory.get(address)
 
     def push_user_stack(self, value):
-        console.debug(f"\tPUSH USER >>s {value}")
-        self.user_stack.push(value)
+        console.debug(f"\tPUSH USER << {value}")
+        next_idx, value = self.user_stack.push(value)
+        console.debug(f"\tMEMORY[{next_idx}] = {value}")
 
     def push_user_stack_multiple(self, increment):
         console.debug(f"\tPUSH USER by {increment}")
@@ -38,7 +39,7 @@ class MemoryController:
 
     def pop_user_stack(self):
         value = self.user_stack.pop()
-        console.debug(f"\tPOP USER << {value}")
+        console.debug(f"\tPOP USER >> {value}")
         return value
 
     def pop_user_stack_multiple(self, increment):
@@ -47,7 +48,8 @@ class MemoryController:
 
     def push_kernel_stack(self, value):
         console.debug(f"\tPUSH KERNEL << {value}")
-        self.kernel_stack.push(value)
+        next_idx, value = self.kernel_stack.push(value)
+        console.debug(f"\tMEMORY[{next_idx}] = {value}")
 
     def push_kernel_stack_multiple(self, increment):
         console.debug(f"\tPUSH KERNEL by {increment}")
