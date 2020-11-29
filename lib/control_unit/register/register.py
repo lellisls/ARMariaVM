@@ -23,6 +23,7 @@ class Register(Enum):
     StackPointer = 14
     ProgramCounter = 15
     StackPointer2 = 16
+    SpecReg = 999
 
     def shortName(self):
         names = {
@@ -40,6 +41,7 @@ class Register(Enum):
             self.StackPointer: "SP",
             self.ProgramCounter: "PC",
             self.StackPointer2: "SP2",
+            self.SpecReg: "XR"
         }
         return names.get(self)
 
@@ -47,17 +49,24 @@ class Register(Enum):
         return reg_bank.getRegister(self.value)
 
     def setValue(self, value):
-        console.debug(f"\t{self} = {value}")
+        console.debug(f"\t{self} <= {value}")
+        return reg_bank.setRegister(self.value, value)
+
+    def copyValueFrom(self, reg: 'Register'):
+        value = reg.getValue()
+        console.debug(f"\t{self} <= {reg} = {value}")
         return reg_bank.setRegister(self.value, value)
 
     def increment(self, increment=1):
+        old_val = self.getValue()
         val = reg_bank.increment(self.value, increment)
-        console.debug(f"\t{self} = {val}")
+        console.debug(f"\t{self} <= {old_val} + {increment} = {val}")
         return val
 
     def decrement(self, decrement=1):
+        old_val = self.getValue()
         val = reg_bank.decrement(self.value, decrement)
-        console.debug(f"\t{self} = {val}")
+        console.debug(f"\t{self} <= {old_val} - {decrement} = {val}")
         return val
 
     def __str__(self):

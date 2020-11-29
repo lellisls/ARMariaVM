@@ -17,7 +17,6 @@ class ControlCore:
     pc = None
     running = True
     next_pc = None
-    specReg = 0
     is_bios = True
     is_kernel = False
 
@@ -277,16 +276,13 @@ class ControlCore:
         self.inst.registerD.setValue(ld)
 
     def inst35_mov(self):
-        rm = self.inst.registerM.getValue()
-        self.inst.registerD.setValue(rm)
+        self.inst.registerD.copyValueFrom(self.inst.registerM)
 
     def inst36_mov(self):
-        rm = self.inst.registerM.getValue()
-        self.inst.registerD.setValue(rm)
+        self.inst.registerD.copyValueFrom(self.inst.registerM)
 
     def inst37_mov(self):
-        rm = self.inst.registerM.getValue()
-        self.inst.registerD.setValue(rm)
+        self.inst.registerD.copyValueFrom(self.inst.registerM)
 
     def inst38_br(self):  # RELATIVE INDIRECT BRANCH
         condition = self.inst.condition.getResult(self.alu)
@@ -364,7 +360,7 @@ class ControlCore:
         self.inst.registerD.setValue(rd)
 
     def inst58_cpxr(self):
-        self.unhandled_inst()
+        self.inst.registerD.copyValueFrom(Register.SpecReg)
 
     def inst59_sxth(self):
         rm = self.inst.registerM.getValue()

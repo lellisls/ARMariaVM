@@ -64,7 +64,7 @@ class MemoryController:
 
     def reset(self):
         self.user_stack.reset()
-        # self.kernel_stack.reset()
+        self.kernel_stack.reset()
 
     def __str__(self):
         output = ""
@@ -107,23 +107,24 @@ class MemoryController:
             return f"{index: 6}: {value :016b} = {value : 6}{self.print_flags(index)}\n"
 
     def print_mark(self, index):
+        result = ""
         if index == self.code_start:
-            return self.print_text(index, "CODE - START")
-        elif index == (self.code_end + 1):
-            return self.print_text(index, "CODE - END")
+            result += self.print_text(index, "CODE - START")
+        if index == (self.code_end + 1):
+            result += self.print_text(index, "CODE - END")
         if index == self.os_start:
-            return self.print_text(index, "OS - START")
-        elif index == (self.os_end + 1):
-            return self.print_text(index, "OS - END")
-        elif index == self.user_stack.start:
-            return self.print_text(index, "USER STACK - START")
-        elif index == (self.user_stack.end + 1):
-            return self.print_text(index, "USER STACK - END")
-        elif index == self.kernel_stack.start:
-            return self.print_text(index, "KERNEL STACK - START")
-        elif index == (self.kernel_stack.end + 1):
-            return self.print_text(index, "KERNEL STACK - END")
-        return ""
+            result += self.print_text(index, "OS - START")
+        if index == (self.os_end + 1):
+            result += self.print_text(index, "OS - END")
+        if index == self.kernel_stack.start:
+            result += self.print_text(index, "KERNEL STACK - START")
+        if index == (self.kernel_stack.end + 1):
+            result += self.print_text(index, "KERNEL STACK - END")
+        if index == self.user_stack.start:
+            result += self.print_text(index, "USER STACK - START")
+        if index == (self.user_stack.end + 1):
+            result += self.print_text(index, "USER STACK - END")
+        return result
 
     @classmethod
     def print_text(cls, index, text):
@@ -131,7 +132,7 @@ class MemoryController:
 
     def print_flags(self, index):
         reg = ""
-        memory_address_regs = [Register.ProgramCounter, Register.StackPointer, Register.UserSPKeeper]
+        memory_address_regs = [Register.ProgramCounter, Register.StackPointer]
 
         for register in memory_address_regs:
             if index == register.getValue():

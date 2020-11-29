@@ -1,4 +1,8 @@
+import logging
+
 from lib.control_unit.register import Register
+
+console = logging.getLogger(__name__)
 
 
 class Stack:
@@ -15,9 +19,14 @@ class Stack:
         self.main_memory.set(next_idx, value)
 
     def pushM(self, increment):
-        print(self.register.getValue())
+        # if self.register.getValue() <= self.start:
+        #     console.info(f"\t!!!Resetting {self.register} to {self.start} !!!")
+        #     self.register.setValue(self.start)
+        #     return self.start
+
+        self._test_and_initialize()
+
         next_idx = self.register.decrement(increment)
-        print(self.register.getValue())
         self._check_index(next_idx)
         return next_idx
 
@@ -27,6 +36,11 @@ class Stack:
         return value
 
     def popM(self, increment):
+        # if self.register.getValue() >= self.end:
+        #     self.register.setValue(self.end)
+        #     return self.end
+        self._test_and_initialize()
+
         next_idx = self.register.increment(increment)
         self.main_memory.set(next_idx - 1, 0)
         self._check_index(next_idx)
@@ -36,10 +50,15 @@ class Stack:
 
         return next_idx
 
+    def _test_and_initialize(self):
+        if self.register.getValue() == 0:
+            console.info(f"\tInitializing {self.register} with {self.end}")
+            self.register.setValue(self.end)
+
     def reset(self):
         for idx in range(self.start, self.end):
             self.main_memory.set(idx, 0)
-        self.register.setValue(self.end)
+        # self.register.setValue(self.end)
 
     def _check_index(self, next_idx):
         if next_idx > self.end or next_idx < self.start:

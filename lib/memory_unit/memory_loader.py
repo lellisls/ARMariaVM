@@ -17,16 +17,16 @@ class MemoryLoader:
         fileReader = FileReader(filename)
         data = fileReader.loadFileRaw()
         for (address, instruction, context) in data:
-            print(f"{address}, {instruction}, {context}")
+            # print(f"{address}, {instruction}, {context}")
             mid = int(len(instruction) / 2)
             inst1, inst2 = int(instruction[:mid], 2), int(instruction[mid:], 2)
 
             if "size" in context:
                 pass
 
-            print(context)
+            # print(context)
             context = self._parse_context(context)
-            print(context)
+            # print(context)
             if split:
                 raise NotImplementedError("NOT IMPLEMENTED")
                 # self.memory.set(start_address + index * 2, inst1)

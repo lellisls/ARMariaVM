@@ -82,9 +82,11 @@ class MainWindow:
         self.core.running = True
 
         def runner():
-            while self.core.running:
-                self.iterate(auto=True)
-            self.update_data()
+            try:
+                while self.core.running:
+                    self.iterate(auto=True)
+            finally:
+                self.update_data()
 
         control_thread = Thread(target=runner, daemon=True)
         control_thread.start()
@@ -105,7 +107,6 @@ class MainWindow:
     def run(self, core: ControlCore):
         self.core = core
         self.reset()
-        self.update_data()
         self.play()
-
+        self.update_data()
         self.window.mainloop()
