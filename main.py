@@ -28,7 +28,7 @@ if __name__ == '__main__':
 
     bios = Memory(pow(2, 9), 16)  # 512b
     bios_loader = MemoryLoader(bios)
-    bios_loader.loadFile(bios_path)
+    bios_loader.loadFile(bios_path, split=False)
     controller = MemoryController()
     memory_loader = MemoryLoader(controller.main_memory)
     memory_loader.loadFile(program_path, split=False)

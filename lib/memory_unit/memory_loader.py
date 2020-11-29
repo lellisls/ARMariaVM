@@ -13,12 +13,11 @@ class MemoryLoader:
     #         for address, inst in enumerate(file.readlines()):
     #             self.memory.set(address, int(inst, 2))
 
-    def loadFile(self, filename, split=False, start_address=0):
+    def loadFile(self, filename, split=False):
         fileReader = FileReader(filename)
         data = fileReader.loadFileRaw()
-        index = 0
         for (address, instruction, context) in data:
-            # print(f"{address}, {instruction}, {context}")
+            print(f"{address}, {instruction}, {context}")
             mid = int(len(instruction) / 2)
             inst1, inst2 = int(instruction[:mid], 2), int(instruction[mid:], 2)
 
@@ -29,14 +28,15 @@ class MemoryLoader:
             context = self._parse_context(context)
             print(context)
             if split:
-                self.memory.set(start_address + index * 2, inst1)
-                self.memory.set(start_address + index * 2 + 1, inst2)
-                self.memory.set_context(start_address + index * 2, context)
+                raise NotImplementedError("NOT IMPLEMENTED")
+                # self.memory.set(start_address + index * 2, inst1)
+                # self.memory.set(start_address + index * 2 + 1, inst2)
+                # self.memory.set_context(start_address + index * 2, context)
             else:
                 instruction = int(instruction, 2)
-                self.memory.set(start_address + index, instruction)
-                self.memory.set_context(start_address + index, context)
-            index += 1
+                self.memory.set(address, instruction)
+                self.memory.set_context(address, context)
+
 
     @classmethod
     def _parse_context(cls, ctx):

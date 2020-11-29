@@ -99,7 +99,7 @@ class MemoryController:
         return output
 
     def display_value(self, index, value):
-        if index < 2048:
+        if index <= self.os_end:
             return self.display_inst(index, value)
         if self.main_memory.width == 32:
             return f"{index: 6}: {value :032b} = {value : 6}{self.print_flags(index)}\n"
