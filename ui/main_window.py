@@ -5,16 +5,28 @@ from tkinter.scrolledtext import ScrolledText
 
 from lib.control_unit.control_core import ControlCore
 from lib.control_unit.register import Register
+from ui.util.key_tracker import KeyTracker
 
 console = logging.getLogger(__name__)
 
 
 class MainWindow:
     core: ControlCore
+    control_thread: Thread = None
 
     def __init__(self):
         self.last_change = -1
         self.window = Tk()
+        self.key_tracker = KeyTracker()
+
+        self.window.bind_all('<KeyPress>', self.key_tracker.report_key_press)
+        # self.window.bind_all('<KeyRelease>', self.key_tracker.report_key_release)
+
+        self.key_tracker.track('n')
+        self.key_tracker.track('r')
+        self.key_tracker.track('f')
+        self.key_tracker.track('space')
+        self.key_tracker.on_key_press = self._handle_key_press
 
         self.window.title("ARMaria VM")
 
@@ -45,9 +57,22 @@ class MainWindow:
         self.btn_frame.grid(column=0, row=1, sticky=E)
         self.registers.grid(column=1, row=1, sticky=W + E)
 
-    @classmethod
-    def _disable_textfield(cls, field):
-        field.bind("<Key>", lambda e: "break")
+    def _handle_key_press(self, event):
+        if event.char == 'n':
+            self.iterate()
+        elif event.keysym == 'r':
+            self.reset()
+        elif event.char == 'f':
+            self.window.state('zoomed')
+        elif event.keysym == 'space':
+            if self.core.running:
+                self.pause()
+            else:
+                self.play()
+
+    def _disable_textfield(self, field):
+        field.bind('<Key>', self.key_tracker.report_key_press)
+        field.bind_all('<KeyPress>', self.key_tracker.report_key_press)
 
     def print_console(self, text):
         self.console.insert(END, f"{text}\n")
@@ -88,13 +113,14 @@ class MainWindow:
             finally:
                 self.update_data()
 
-        control_thread = Thread(target=runner, daemon=True)
-        control_thread.start()
+        self.control_thread = Thread(target=runner, daemon=True)
+        self.control_thread.start()
 
     def pause(self):
         self.core.running = False
 
     def reset(self):
+        self.core.running = False
         self.core.reset()
         self.console.delete('1.0', END)
         self.update_data()
@@ -107,6 +133,6 @@ class MainWindow:
     def run(self, core: ControlCore):
         self.core = core
         self.reset()
-        self.play()
+        # self.play()
         self.update_data()
         self.window.mainloop()

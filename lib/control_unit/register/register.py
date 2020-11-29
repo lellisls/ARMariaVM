@@ -70,4 +70,4 @@ class Register(Enum):
         return val
 
     def __str__(self):
-        return f"${self.shortName()}"""
+        return f"${self.shortName()}"

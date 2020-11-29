@@ -9,7 +9,6 @@ class Instruction:
     registerN = None
     registerD = None
     condition = None
-    offset = None
 
     @abstractmethod
     def _print_registers(self):

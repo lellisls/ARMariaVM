@@ -310,7 +310,11 @@ class ControlCore:
         self.unhandled_inst()
 
     def inst44_ldr(self):
-        self.unhandled_inst()
+        lm = self.inst.registerM.getValue()
+        ln = self.inst.registerN.getValue()
+        ld = self.memory_ctrl.get_data(lm + ln)
+        self.inst.registerD.setValue(ld)
+        self.inst.registerD.setValue(ld)
 
     def inst45_ldrh(self):
         self.unhandled_inst()
@@ -448,7 +452,14 @@ class ControlCore:
         Register.SystemCallRegister.setValue(sc.value)
 
     def inst73_b(self):
-        self.unhandled_inst()
+        condition = self.inst.condition.getResult(self.alu)
+        imm = self.inst.immediate
+
+        if condition:
+            console.debug(f"\tTake branch {self.pc} + {imm}")
+            self.next_pc = self.pc + imm
+        else:
+            console.debug("\tNot take branch")
 
     def inst74_nop(self):
         pass

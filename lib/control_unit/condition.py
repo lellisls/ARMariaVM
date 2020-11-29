@@ -49,5 +49,5 @@ class Condition(Enum):
             Condition.AL: True,
         })
         result = condition_result.get(self)
-        console.debug(f"Condition {self.name} (Z={zero}, C={carry}, V={overflow}, N={negative}) = {result}")
+        console.debug(f"\tCondition {self.name} (Z={zero}, C={carry}, V={overflow}, N={negative}) = {result}")
         return result
