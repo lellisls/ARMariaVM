@@ -9,7 +9,7 @@ class FileReader:
 
     def loadFileRaw(self):
         rows = re.findall(r"(\d+) : ([0-1]+); -- (.*)", self.data)
-        return [(int(address) - 1, compressed, contexts) for address, compressed, contexts in rows]
+        return [(int(address), compressed, contexts) for address, compressed, contexts in rows]
 
     def loadFile(self):
         instructions = self.loadFileRaw()
@@ -32,5 +32,5 @@ class FileReader:
 
 if __name__ == '__main__':
     loader = FileReader(os.path.join(os.path.dirname(__file__), "..", '..', "data", "program.txt"))
-    console.debug(loader.loadFile())
-    console.debug(loader.loadFileRaw())
+    print(loader.loadFile())
+    print(loader.loadFileRaw())

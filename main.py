@@ -17,8 +17,8 @@ logger = logging.getLogger()
 factory = InstructionFactory()
 main_dir = os.path.dirname(__file__)
 data_dir = os.path.join(main_dir, 'data')
-bios_path = os.path.join(data_dir, 'bios.txt')
-program_path = os.path.join(data_dir, 'program.txt')
+bios_path = os.path.join(data_dir, 'bios.mif')
+program_path = os.path.join(data_dir, 'program.mif')
 
 if __name__ == '__main__':
     window = MainWindow()
@@ -28,16 +28,17 @@ if __name__ == '__main__':
 
     bios = Memory(pow(2, 9), 16)  # 512b
     bios_loader = MemoryLoader(bios)
-    bios_loader.loadBios(bios_path)
+    bios_loader.loadFile(bios_path)
     controller = MemoryController()
     memory_loader = MemoryLoader(controller.main_memory)
     memory_loader.loadFile(program_path, split=False)
 
     Register.ProgramCounter.setValue(0)
 
-    core = ControlCore(controller)
+    core = ControlCore(controller, bios)
 
     window.run(core)
+
     core.running = False
 
     # console.debug("RUNNING BIOS:")

@@ -22,6 +22,7 @@ names = {
     49: "LDR",
     56: "ADD",
     57: "ADD",
+    58: "CXPR",
     59: "SXTH",
     61: "UXTH",
     67: "PUSH",
@@ -33,6 +34,7 @@ names = {
     73: "B",
     74: "NOP",
     75: "HLT",
+    76: "PXR",
     77: "PUSHM",
     78: "POPM",  # unhandled
     79: "BL",  # unhandled

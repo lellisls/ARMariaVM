@@ -15,7 +15,9 @@ class Stack:
         self.main_memory.set(next_idx, value)
 
     def pushM(self, increment):
+        print(self.register.getValue())
         next_idx = self.register.decrement(increment)
+        print(self.register.getValue())
         self._check_index(next_idx)
         return next_idx
 
@@ -41,4 +43,4 @@ class Stack:
 
     def _check_index(self, next_idx):
         if next_idx > self.end or next_idx < self.start:
-            raise RuntimeError(f"Stack overflow: {self.start} <= {next_idx} < {self.size}")
+            raise RuntimeError(f"Stack overflow: {self.start} <= {next_idx} < {self.end}")

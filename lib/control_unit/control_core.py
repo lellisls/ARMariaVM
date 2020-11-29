@@ -6,7 +6,7 @@ from lib.control_unit.instruction.instruction import Instruction
 from lib.control_unit.instruction.instruction_factory import InstructionFactory
 from lib.control_unit.register import Register
 from lib.control_unit.system_call import SystemCall
-from lib.memory_unit import MemoryController
+from lib.memory_unit import MemoryController, Memory
 from lib.signal_extender import SignalExtender
 
 console = logging.getLogger(__name__)
@@ -17,17 +17,27 @@ class ControlCore:
     pc = None
     running = True
     next_pc = None
+    specReg = 0
+    is_bios = True
+    is_kernel = False
 
-    def __init__(self, memory_ctrl: MemoryController):
+    # Used for input debugging
+    values = []
+
+    def __init__(self, memory_ctrl: MemoryController, bios: Memory):
         self.instruction_factory = InstructionFactory()
         self.sig_ex = SignalExtender()
         self.bs = BarrelShifter()
         self.alu = ALU()
 
         self.memory_ctrl = memory_ctrl
+        self.bios = bios
+
         self.reset()
 
     def reset(self):
+        self.is_bios = True
+        self.is_kernel = False
         self.pc = None
         self.running = True
         self.next_pc = None
@@ -41,12 +51,20 @@ class ControlCore:
         self.pc = Register.ProgramCounter.getValue()
         self.next_pc = self.pc + 1
 
-        inst_code = self.memory_ctrl.get_data(self.pc)
+        code_memory = self.bios if self.is_bios else self.memory_ctrl.main_memory
+
+        inst_code = code_memory.get(self.pc)
         self.inst = self.instruction_factory.build(inst_code)
 
-        ctx = self.memory_ctrl.main_memory.get_context(self.pc)
+        ctx = code_memory.get_context(self.pc)
         ctx = f" - {ctx}" if ctx != "" else ""
-        console.debug(f"\n{self.pc: 4}: {self.inst}{ctx}")
+        source = ""
+        if self.is_bios:
+            source = " (BIOS)"
+        elif self.is_kernel:
+            source = " (OS)"
+
+        console.debug(f"\n{self.pc: 4}{source}: {self.inst}{ctx}")
 
         self.calculate()
         Register.ProgramCounter.setValue(self.next_pc)
@@ -380,10 +398,17 @@ class ControlCore:
 
     def inst67_push(self):
         rd = self.inst.registerD.getValue()
-        self.memory_ctrl.push_user_stack(rd)
+        if self.is_kernel:
+            self.memory_ctrl.push_kernel_stack(rd)
+        else:
+            self.memory_ctrl.push_user_stack(rd)
 
     def inst68_pop(self):
-        value = self.memory_ctrl.pop_user_stack()
+        if self.is_kernel:
+            value = self.memory_ctrl.pop_kernel_stack()
+        else:
+            value = self.memory_ctrl.pop_user_stack()
+
         self.inst.registerD.setValue(value)
 
     def inst69_output(self):
@@ -404,10 +429,27 @@ class ControlCore:
         self.inst.registerD.setValue(value)
 
     def inst72_swi(self):  # Software interruption
-        console.info(f"\tInterruption: {SystemCall(self.inst.immediate)}")
-        if SystemCall.ProgramCompletion == SystemCall(self.inst.immediate):
+        sc = SystemCall(self.inst.immediate)
+
+        console.info(f"\tInterruption: {sc}")
+        self.is_bios = False
+
+        if SystemCall.ProgramCompletion == sc:
             self.running = False
-            self.next_pc = self.pc
+
+        if self.is_kernel:  # Exit privileged mode
+            Register.StackPointer2.setValue(Register.StackPointer.getValue())
+            Register.StackPointer.setValue(Register.UserSPKeeper.getValue())
+            Register.ProgramCounter.setValue(Register.PCKeeper.getValue())
+            self.is_kernel = False
+        else:  # Enter privileged mode
+            Register.UserSPKeeper.setValue(Register.StackPointer.getValue())
+            Register.PCKeeper.setValue(Register.ProgramCounter.getValue())
+            Register.StackPointer.setValue(Register.StackPointer2.getValue())
+            self.next_pc = self.memory_ctrl.os_start
+            self.is_kernel = True
+
+        Register.SystemCallRegister.setValue(sc.value)
 
     def inst73_b(self):
         self.unhandled_inst()
@@ -422,10 +464,16 @@ class ControlCore:
         self.unhandled_inst()
 
     def inst77_pushm(self):
-        self.memory_ctrl.push_user_stack_multiple(self.inst.immediate)
+        if self.is_kernel:
+            self.memory_ctrl.push_kernel_stack_multiple(self.inst.immediate)
+        else:
+            self.memory_ctrl.push_user_stack_multiple(self.inst.immediate)
 
     def inst78_popm(self):
-        self.memory_ctrl.pop_user_stack_multiple(self.inst.immediate)
+        if self.is_kernel:
+            self.memory_ctrl.pop_kernel_stack_multiple(self.inst.immediate)
+        else:
+            self.memory_ctrl.pop_user_stack_multiple(self.inst.immediate)
 
     def inst79_bl(self):  # RELATIVE INDIRECT BRANCH
         Register.LinkRegister.setValue(self.pc + 1)

@@ -22,6 +22,7 @@ class Register(Enum):
     PCKeeper = 13
     StackPointer = 14
     ProgramCounter = 15
+    StackPointer2 = 16
 
     def shortName(self):
         names = {
@@ -38,6 +39,7 @@ class Register(Enum):
             self.PCKeeper: "PCK",
             self.StackPointer: "SP",
             self.ProgramCounter: "PC",
+            self.StackPointer2: "SP2",
         }
         return names.get(self)
 

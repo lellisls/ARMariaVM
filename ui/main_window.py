@@ -106,5 +106,6 @@ class MainWindow:
         self.core = core
         self.reset()
         self.update_data()
+        self.play()
 
         self.window.mainloop()

@@ -1,5 +1,4 @@
 import logging
-import re
 
 from lib.control_unit.instruction.instruction_factory import InstructionFactory
 from lib.control_unit.register import Register
@@ -15,8 +14,8 @@ class MemoryController:
     def __init__(self):
         self.inst_factory = InstructionFactory()
         self.main_memory = Memory(32768)  # 128k
-        self.privileged_stack = Stack(self.main_memory, Register.StackPointer, 4096, 6143)
-        self.user_stack = Stack(self.main_memory, Register.UserSPKeeper, 6144, 8191)
+        self.kernel_stack = Stack(self.main_memory, Register.StackPointer, 4096, 6143)
+        self.user_stack = Stack(self.main_memory, Register.StackPointer, 6144, 8191)
         self.code_start = 0
         self.code_end = 2047
         self.os_start = 2048
@@ -30,7 +29,7 @@ class MemoryController:
         return self.main_memory.get(address)
 
     def push_user_stack(self, value):
-        console.debug(f"\tPUSH USER << {value}")
+        console.debug(f"\tPUSH USER >>s {value}")
         self.user_stack.push(value)
 
     def push_user_stack_multiple(self, increment):
@@ -48,15 +47,24 @@ class MemoryController:
 
     def push_kernel_stack(self, value):
         console.debug(f"\tPUSH KERNEL << {value}")
-        self.privileged_stack.push(value)
+        self.kernel_stack.push(value)
 
     def push_kernel_stack_multiple(self, increment):
         console.debug(f"\tPUSH KERNEL by {increment}")
-        self.privileged_stack.pushM(increment)
+        self.kernel_stack.pushM(increment)
+
+    def pop_kernel_stack(self):
+        value = self.kernel_stack.pop()
+        console.debug(f"\tPOP KERNEL >> {value}")
+        return value
+
+    def pop_kernel_stack_multiple(self, increment):
+        self.kernel_stack.popM(increment)
+        console.debug(f"\tPOP KERNEL by {increment}")
 
     def reset(self):
         self.user_stack.reset()
-        self.privileged_stack.reset()
+        # self.kernel_stack.reset()
 
     def __str__(self):
         output = ""
@@ -111,9 +119,9 @@ class MemoryController:
             return self.print_text(index, "USER STACK - START")
         elif index == (self.user_stack.end + 1):
             return self.print_text(index, "USER STACK - END")
-        elif index == self.privileged_stack.start:
+        elif index == self.kernel_stack.start:
             return self.print_text(index, "KERNEL STACK - START")
-        elif index == (self.privileged_stack.end + 1):
+        elif index == (self.kernel_stack.end + 1):
             return self.print_text(index, "KERNEL STACK - END")
         return ""
 
