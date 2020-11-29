@@ -54,7 +54,7 @@ class Stack:
     def _test_and_initialize(self):
         if self.register.getValue() == 0:
             console.info(f"\tInitializing {self.register} with {self.end}")
-            self.register.setValue(self.end)
+            self.register.setValue(self.end+1)
 
     def reset(self):
         for idx in range(self.start, self.end):
