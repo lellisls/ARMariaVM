@@ -9,33 +9,33 @@ def alu():
 
 
 def test__value_with_carry(alu: ALU):
-    v1 = max_32_bits
-    assert alu._value_with_carry(v1) == v1
+    v1 = max_32_bits_signed
+    assert alu._value_with_carry(0, 0, v1) == v1
     assert alu.carry == 0
 
-    assert alu._value_with_carry(v1 * 2) == max_32_bits
+    assert alu._value_with_carry(0, 0, v1 * 2) == max_32_bits_signed
     assert alu.carry == 1
 
-    assert alu._value_with_carry(v1 + 1) == 1
+    assert alu._value_with_carry(0, 0, v1 + 1) == 1
     assert alu.carry == 1
 
-    v2 = min_32_bits
-    assert alu._value_with_carry(v2) == v2
+    v2 = min_32_bits_signed
+    assert alu._value_with_carry(0, 0, v2) == v2
     assert alu.carry == 0
 
-    assert alu._value_with_carry(v2 * 2) == min_32_bits
+    assert alu._value_with_carry(0, 0, v2 * 2) == min_32_bits_signed
     assert alu.carry == 1
 
-    assert alu._value_with_carry(v2 - 1) == -1
+    assert alu._value_with_carry(0, 0, v2 - 1) == -1
     assert alu.carry == 1
 
 
 def test__value(alu: ALU):
-    assert min_32_bits == alu._value(min_32_bits)
+    assert min_32_bits_signed == alu._value(min_32_bits_signed)
     assert alu.zero == 0
     assert alu.negative == 1
 
-    assert max_32_bits == alu._value(max_32_bits)
+    assert max_32_bits_signed == alu._value(max_32_bits_signed)
     assert alu.zero == 0
     assert alu.negative == 0
 
@@ -44,28 +44,28 @@ def test__value(alu: ALU):
     assert alu.negative == 0
 
     with pytest.raises(ValueError):
-        alu._value(max_32_bits + 1)
+        alu._value(max_32_bits_signed + 1)
 
     with pytest.raises(ValueError):
-        alu._value(min_32_bits - 1)
+        alu._value(min_32_bits_signed - 1)
 
 
 def test_adc(alu: ALU):
     alu.previous_spec_reg_carry = 1
     assert alu.adc(1, 2) == 4
-    assert alu.adc(max_32_bits, 0) == 1
+    assert alu.adc(max_32_bits_signed, 0) == 1
     assert alu.carry == 1
-    assert alu.adc(max_32_bits, 1) == 2
+    assert alu.adc(max_32_bits_signed, 1) == 2
     assert alu.carry == 1
-    assert alu.adc(min_32_bits, -2) == -1
+    assert alu.adc(min_32_bits_signed, -2) == -1
     assert alu.carry == 1
 
 
 def test_add_or_cmn(alu: ALU):
     assert alu.add_or_cmn(1, 2) == 3
-    assert alu.add_or_cmn(max_32_bits, 1) == 1
+    assert alu.add_or_cmn(max_32_bits_signed, 1) == 1
     assert alu.carry == 1
-    assert alu.add_or_cmn(min_32_bits, -10) == -10
+    assert alu.add_or_cmn(min_32_bits_signed, -10) == -10
     assert alu.carry == 1
 
 
@@ -94,10 +94,10 @@ def test_bic(alu: ALU):
 def test_sub_or_cmp(alu: ALU):
     assert alu.sub_or_cmp(1, 2) == -1
 
-    assert alu.sub_or_cmp(min_32_bits, 1) == -1
+    assert alu.sub_or_cmp(min_32_bits_signed, 1) == -1
     assert alu.carry == 1
 
-    assert alu.sub_or_cmp(max_32_bits, -10) == 10
+    assert alu.sub_or_cmp(max_32_bits_signed, -10) == 10
     assert alu.carry == 1
 
     assert alu.sub_or_cmp(0, 0) == 0
@@ -142,7 +142,7 @@ def test_sbc(alu: ALU):
 
 def test_mul(alu: ALU):
     assert alu.mul(3, 2) == 6
-    assert alu.mul(max_32_bits, 1) == max_32_bits
+    assert alu.mul(max_32_bits_signed, 1) == max_32_bits_signed
 
 
 def test_div(alu: ALU):
@@ -150,11 +150,11 @@ def test_div(alu: ALU):
     assert alu.div(4, 2) == 2
     assert alu.div(-4, 2) == -2
     assert alu.div(-8, -2) == 4
-    assert alu.div(max_32_bits, 1) == max_32_bits
+    assert alu.div(max_32_bits_signed, 1) == max_32_bits_signed
 
 
 def test_rest(alu: ALU):
-    assert alu.rest(max_32_bits, 1) == 0
+    assert alu.rest(max_32_bits_signed, 1) == 0
     assert alu.rest(3, 2) == 1
     assert alu.rest(4, 2) == 0
     assert alu.rest(-4, 2) == 0
@@ -162,8 +162,8 @@ def test_rest(alu: ALU):
 
 
 def test_barrel_shifter_result(alu: ALU):
-    assert alu.barrel_shifter_result(max_32_bits) == max_32_bits
-    assert alu.barrel_shifter_result(min_32_bits) == min_32_bits
+    assert alu.barrel_shifter_result(max_32_bits_signed) == max_32_bits_signed
+    assert alu.barrel_shifter_result(min_32_bits_signed) == min_32_bits_signed
 
 
 def test_xor(alu: ALU):

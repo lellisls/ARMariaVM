@@ -1,5 +1,4 @@
-min_32_bits = -2 ** 31
-max_32_bits = 2 ** 32 - 1
+from lib.binary_utils import BinaryUtils, min_32_bits_signed, max_32_bits_signed
 
 
 class ALU:
@@ -10,27 +9,34 @@ class ALU:
         self.overflow = 0
         self.previous_spec_reg_carry = 0
 
+    def _test_flags(self, a, b, result):
+        self.overflow = BinaryUtils.overflow_msb(a, b, result)
+        self.lt = a < b
+        self.gt = a > b
+
     def _value_common(self, value: int) -> int:
         value = int(value)
         self.zero = value == 0
-        self.negative = value < 0
-        if value > max_32_bits or value < min_32_bits:
+        self.negative = BinaryUtils.msb(value)
+        if value > max_32_bits_signed or value < min_32_bits_signed:
             raise ValueError
         return value
 
-    def _value_with_carry(self, value: int) -> int:
+    def _value_with_carry(self, a, b, value: int) -> int:
         self._reset()
+        self._test_flags(a, b, value)
+
         # missing overflow handling
-        if value > max_32_bits:
+        if value > max_32_bits_signed:
             self.carry = 1
-            return self._value_common(value - max_32_bits)
+            value -= max_32_bits_signed
 
-        if value < min_32_bits:
+        if value < min_32_bits_signed:
             self.carry = 1
-            return self._value_common(value - min_32_bits)
+            value -= min_32_bits_signed
 
-        self.carry = 0
-        return self._value_common(value)
+        result = self._value_common(value)
+        return result
 
     def _value(self, value: int) -> int:
         self._reset()
@@ -38,11 +44,11 @@ class ALU:
 
     def adc(self, a: int, b: int):
         """ADD with carry"""
-        return self._value_with_carry(a + b + self.previous_spec_reg_carry)
+        return self._value_with_carry(a, b, a + b + self.previous_spec_reg_carry)
 
     def add_or_cmn(self, a: int, b: int):
         """ADD or CMN"""
-        return self._value_with_carry(a + b)
+        return self._value_with_carry(a, b, a + b)
 
     def bitwise_and(self, a: int, b: int):
         """Bitwise AND"""
@@ -54,7 +60,7 @@ class ALU:
 
     def sub_or_cmp(self, a: int, b: int):
         """SUB or CMP"""
-        return self._value_with_carry(a - b)
+        return self._value_with_carry(a, b, a - b)
 
     def neg(self, a: int):
         """Signal inversion"""
@@ -66,7 +72,7 @@ class ALU:
 
     def sbc(self, a: int, b: int):
         """SUB with carry"""
-        return self._value_with_carry(a - b - int(not self.previous_spec_reg_carry))
+        return self._value_with_carry(a, b, a - b - int(not self.previous_spec_reg_carry))
 
     def mul(self, a: int, b: int):
         """Multiplication"""
@@ -110,3 +116,5 @@ class ALU:
         self.zero = 0
         self.carry = 0
         self.overflow = 0
+        self.lt = False
+        self.gt = False

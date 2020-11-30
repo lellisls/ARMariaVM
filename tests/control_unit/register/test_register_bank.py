@@ -26,13 +26,3 @@ def test_get_set_register_value(register_bank: RegisterBank):
         register_bank.setRegister(register, expected_value)
         value = register_bank.getRegister(register)
         assert value == expected_value
-
-
-def test_set_unhandled_register(register_bank: RegisterBank):
-    with pytest.raises(ValueError):
-        register_bank.setRegister(1000, 10)
-
-
-def test_get_unhandled_register(register_bank: RegisterBank):
-    with pytest.raises(ValueError):
-        register_bank.getRegister(1000)
