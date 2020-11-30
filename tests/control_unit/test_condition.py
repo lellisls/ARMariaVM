@@ -20,10 +20,11 @@ def test_less(alu: ALU):
     alu.sub_or_cmp(0, 10)
     assert alu.zero == 0
     assert alu.negative == 1
-    assert alu.overflow == 1
+    assert alu.overflow == 0
     assert alu.carry == 0
 
     assert Condition.EQ.getResult(alu) is False
     assert Condition.LE.getResult(alu) is True
+    # assert Condition.LS.getResult(alu) is True
     assert Condition.LT.getResult(alu) is True
     assert Condition.GE.getResult(alu) is False

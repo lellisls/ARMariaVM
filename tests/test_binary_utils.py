@@ -22,3 +22,12 @@ def test_msb():
     assert BinaryUtils.msb(1) == 0
     assert BinaryUtils.msb(0) == 0
     assert BinaryUtils.msb(-1) == 1
+
+
+def test_add_2cb():
+    assert BinaryUtils.add_2cb(0, 0) == (False, 0)
+    assert BinaryUtils.add_2cb(0, -1) == (False, -1)
+    assert BinaryUtils.add_2cb(0, min_32_bits_signed) == (False, min_32_bits_signed)
+    assert BinaryUtils.add_2cb(0, max_32_bits_signed) == (False, max_32_bits_signed)
+    assert BinaryUtils.add_2cb(min_32_bits_signed, min_32_bits_signed) == (True, 0)
+    assert BinaryUtils.add_2cb(-1, -1) == (True, -1 -1)
