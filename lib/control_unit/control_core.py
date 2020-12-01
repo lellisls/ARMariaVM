@@ -42,7 +42,7 @@ class ControlCore:
         self.next_pc = None
 
         for reg in Register:
-            reg.setValue(0)
+            reg.setPrivilegedValue(0)
         self.memory_ctrl.reset()
         self.values = [2, 4]
 
@@ -66,7 +66,7 @@ class ControlCore:
         console.debug(f"\n{self.pc: 4}{source}: {self.inst}{ctx}")
 
         self.calculate()
-        Register.ProgramCounter.setValue(self.next_pc)
+        Register.ProgramCounter.setPrivilegedValue(self.next_pc)
 
     def calculate(self):
         instructions = {
@@ -440,7 +440,7 @@ class ControlCore:
         if self.is_kernel:  # Exit privileged mode
             Register.StackPointer2.setValue(Register.StackPointer.getValue())
             Register.StackPointer.setValue(Register.UserSPKeeper.getValue())
-            Register.ProgramCounter.setValue(Register.PCKeeper.getValue())
+            Register.ProgramCounter.setPrivilegedValue(Register.PCKeeper.getValue())
             self.is_kernel = False
         else:  # Enter privileged mode
             Register.UserSPKeeper.setValue(Register.StackPointer.getValue())
@@ -468,7 +468,7 @@ class ControlCore:
         self.unhandled_inst()
 
     def inst76_pxr(self):
-        self.unhandled_inst()
+        Register.SpecReg.copyValueFrom(self.inst.registerD)
 
     def inst77_pushm(self):
         if self.is_kernel:

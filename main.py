@@ -33,7 +33,7 @@ if __name__ == '__main__':
     memory_loader = MemoryLoader(controller.main_memory)
     memory_loader.loadFile(program_path, split=False)
 
-    Register.ProgramCounter.setValue(0)
+    Register.ProgramCounter.setPrivilegedValue(0)
 
     core = ControlCore(controller, bios)
 

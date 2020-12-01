@@ -1,3 +1,6 @@
+from lib.binary_utils import BinaryUtils
+
+
 class SignalExtender:
     @classmethod
     def extend16(cls, value):
@@ -16,6 +19,5 @@ class SignalExtender:
         if value[0] == '0':
             return int(value, 2)
 
-        neg = int(cls._neg(value), 2)
+        neg = int(BinaryUtils.neg(value), 2)
         return - (neg + 1)
-

@@ -49,6 +49,12 @@ class Register(Enum):
         return reg_bank.getRegister(self.value)
 
     def setValue(self, value):
+        if self == Register.ProgramCounter:
+            raise ValueError("Illegal PC update")
+        console.debug(f"\t{self} <= {value}")
+        return reg_bank.setRegister(self.value, value)
+
+    def setPrivilegedValue(self, value):
         console.debug(f"\t{self} <= {value}")
         return reg_bank.setRegister(self.value, value)
 
